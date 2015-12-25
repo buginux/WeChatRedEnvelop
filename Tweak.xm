@@ -1,4 +1,4 @@
-#import "WeChatRobotForNFChina.h"
+#import "WeChatRedEnvelop.h"
 
 %hook CMessageMgr
 - (void)AsyncOnAddMsg:(NSString *)msg MsgWrap:(CMessageWrap *)wrap {
