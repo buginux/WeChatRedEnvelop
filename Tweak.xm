@@ -3,11 +3,7 @@
 %hook CMessageMgr
 - (void)AsyncOnAddMsg:(NSString *)msg MsgWrap:(CMessageWrap *)wrap {
 	%orig;
-
-
-
-
-
+	
 	switch(wrap.m_uiMessageType) {
 	case 49: { // AppNode
 
@@ -36,15 +32,7 @@
 				[params safeSetObject:[selfContact getContactDisplayName] forKey:@"nickName"];
 				[params safeSetObject:[selfContact m_nsHeadImgUrl] forKey:@"headImg"];
 				[params safeSetObject:[[wrap m_oWCPayInfoItem] m_c2cNativeUrl] forKey:@"nativeUrl"];
-				[params safeSetObject:[selfContact m_nsUsrName] forKey:@"sessionUserName"];
-
-				// params[@"msgType"] = nativeUrlDict[@"msgtype"];
-				// params[@"sendId"] = nativeUrlDict[@"sendid"];
-				// params[@"channelId"] = nativeUrlDict[@"channelid"];
-				// params[@"nickName"] = [selfContact getContactDisplayName];
-				// params[@"headImg"] = [selfContact m_nsHeadImgUrl];
-				// params[@"nativeUrl"] = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl];
-				// params[@"sessionUserName"] = [selfContact m_nsUsrName];		
+				[params safeSetObject:[selfContact m_nsUsrName] forKey:@"sessionUserName"];	
 
 				WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
 				[logicMgr OpenRedEnvelopesRequest:params];
