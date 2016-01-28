@@ -16,6 +16,25 @@
 
 这个插件在我和我同事的设备上运行良好，但是有童鞋反馈说他们装上了没有反应，如果你也有类似的情况，可以直接提 issue 并说明设备版本，系统版本以及微信的版本，我会尽快着手修复的。
 
+根据到目前为止的总结，插件无效的原因可能如下：
+
+### 1. ldid 无效
+
+ldid 是用于对 tweak 进行签名的，如果 ldid 无效，则 tweak 是不起作用的。
+
+确认 ldid 是否有错误的步骤：
+
+1. 在 cydia 上搜索安装 syslogd to /var/log/syslog，安装后重启手机
+2. 重装安装 tweak
+3. 查看 /var/log/syslog 文件中是否有类似信息：
+
+	```
+	binary not signed (use ldid -S)
+	failure to check WeChatRedEnvelop.dylib
+	```
+如果确认是 ldid 有问题，请重新下载新版本进行安装。
+
+
 ## 特别感谢
 
 [狗神](https://github.com/iosre)，即 [iOS应用逆向工程](http://www.amazon.cn/iOS%E5%BA%94%E7%94%A8%E9%80%86%E5%90%91%E5%B7%A5%E7%A8%8B-%E6%B2%99%E6%A2%93%E7%A4%BE/dp/B00VFDVY7E/ref=sr_1_1?ie=UTF8&qid=1453170509&sr=8-1&keywords=ios%E9%80%86%E5%90%91%E5%B7%A5%E7%A8%8B)的作者。
