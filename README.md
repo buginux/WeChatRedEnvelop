@@ -27,11 +27,10 @@ ldid 是用于对 tweak 进行签名的，如果 ldid 无效，则 tweak 是不�
 1. 在 cydia 上搜索安装 syslogd to /var/log/syslog，安装后重启手机
 2. 重装安装 tweak
 3. 查看 /var/log/syslog 文件中是否有类似信息：
-
-	```
-	binary not signed (use ldid -S)
-	failure to check WeChatRedEnvelop.dylib
-	```
+```
+binary not signed (use ldid -S)
+failure to check WeChatRedEnvelop.dylib
+```
 如果确认是 ldid 有问题，请重新下载新版本进行安装。
 
 
