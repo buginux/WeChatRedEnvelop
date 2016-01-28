@@ -15,9 +15,9 @@
 			isMesasgeFromMe = YES;
 		}
 
-		if ([wrap.m_nsContent containsString:@"wxpay://"]) { // 红包
-			if ([wrap.m_nsFromUsr containsString:@"@chatroom"] ||
-				(isMesasgeFromMe && [wrap.m_nsToUsr containsString:@"@chatroom"])) { // 群组红包或群组里自己发的红包
+		if ([wrap.m_nsContent rangeOfString:@"wxpay://"].location != NSNotFound) { // 红包
+			if ([wrap.m_nsFromUsr rangeOfString:@"@chatroom"].location != NSNotFound ||
+				(isMesasgeFromMe && [wrap.m_nsToUsr rangeOfString:@"@chatroom"].location != NSNotFound)) { // 群组红包或群组里自己发的红包
 
 				NSString *nativeUrl = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl];
 				nativeUrl = [nativeUrl substringFromIndex:[@"wxpay://c2cbizmessagehandler/hongbao/receivehongbao?" length]];
