@@ -32,7 +32,7 @@
 				[params safeSetObject:[selfContact getContactDisplayName] forKey:@"nickName"];
 				[params safeSetObject:[selfContact m_nsHeadImgUrl] forKey:@"headImg"];
 				[params safeSetObject:[[wrap m_oWCPayInfoItem] m_c2cNativeUrl] forKey:@"nativeUrl"];
-				[params safeSetObject:[selfContact m_nsUsrName] forKey:@"sessionUserName"];	
+				[params safeSetObject:wrap.m_nsFromUsr forKey:@"sessionUserName"];	
 
 				WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
 				[logicMgr OpenRedEnvelopesRequest:params];
