@@ -1,4 +1,3 @@
-
 @interface WCPayInfoItem: NSObject
 
 @property(retain, nonatomic) NSString *m_c2cNativeUrl;
@@ -42,7 +41,7 @@
 @end
 
 @interface WCRedEnvelopesControlData : NSObject
-@property(retain, nonatomic) CMessageWrap *m_oSelectedMessageWrap; 
+@property(retain, nonatomic) CMessageWrap *m_oSelectedMessageWrap;
 @end
 
 @interface MMServiceCenter : NSObject
@@ -50,19 +49,6 @@
 - (id)getService:(Class)service;
 @end
 
-// @interface WCRedEnvelopesControlMgr : NSObject
-// - (unsigned int)startLogic:(id)arg1;
-// @end
-
-// @interface WCRedEnvelopesReceiveControlLogic : NSObject
-
-// - (id)initWithData:(id)arg1;
-
-// - (void)startLogic;
-
-// - (void)WCRedEnvelopesReceiveHomeViewOpenRedEnvelopes;
-
-// @end
 
 @interface WCRedEnvelopesLogicMgr: NSObject
 - (void)OpenRedEnvelopesRequest:(id)params;
@@ -95,6 +81,24 @@
 - (void)safeSetObject:(id)arg1 forKey:(id)arg2;
 @end
 
+unsigned int yb_delayTime = 0;
+BOOL yb_shouldStart = YES;
+long yb_cellNumber = 0;
 
 
+@interface MMUINavigationBar : UINavigationBar
+- (void)setFrame:(struct CGRect)arg1;
+@end
+
+@interface MMUINavigationController : UINavigationController
+@end
+
+@interface MMUIViewController : UIViewController
+@end
+
+@interface SettingBaseViewController : MMUIViewController
+@end
+
+@interface SettingPluginsViewController : SettingBaseViewController
+@end
 
