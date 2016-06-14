@@ -26,13 +26,13 @@
 
 				/** 构造参数 */
 				NSMutableDictionary *params = [@{} mutableCopy];
-				[params safeSetObject:nativeUrlDict[@"msgtype"] forKey:@"msgType"];
-				[params safeSetObject:nativeUrlDict[@"sendid"] forKey:@"sendId"];
-				[params safeSetObject:nativeUrlDict[@"channelid"] forKey:@"channelId"];
-				[params safeSetObject:[selfContact getContactDisplayName] forKey:@"nickName"];
-				[params safeSetObject:[selfContact m_nsHeadImgUrl] forKey:@"headImg"];
-				[params safeSetObject:[[wrap m_oWCPayInfoItem] m_c2cNativeUrl] forKey:@"nativeUrl"];
-				[params safeSetObject:wrap.m_nsFromUsr forKey:@"sessionUserName"];	
+				params[@"msgType"] = nativeUrlDict[@"msgtype"] ?: @"1";
+				params[@"sendId"] = nativeUrlDict[@"sendid"] ?: @"";
+				params[@"channelId"] = nativeUrlDict[@"channelid"] ?: @"1";
+				params[@"nickName"] = [selfContact getContactDisplayName] ?: @"小锅";
+				params[@"headImg"] = [selfContact m_nsHeadImgUrl] ?: @"";
+				params[@"nativeUrl"] = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl] ?: @"";
+				params[@"sessionUserName"] = wrap.m_nsFromUsr ?: @"";
 
 				WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
 				[logicMgr OpenRedEnvelopesRequest:params];
