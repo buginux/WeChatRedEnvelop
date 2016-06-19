@@ -10,7 +10,7 @@
 
 有很多小伙伴都反应说不知道怎么安装，因此写了一篇博客来说明如何从源码安装 tweak。
 
-[教程地址](http://www.swiftyper.com/ios-tweak-install-guide/)
+[教程地址](http://www.swiftyper.com/2016/01/25/ios-tweak-install-guide/)
 
 ## 反馈
 
