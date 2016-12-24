@@ -84,13 +84,11 @@
 		delayCellInfo = [%c(MMTableViewCellInfo) normalCellForSel:@selector(settingDelay) target:self title:@"随机延迟" rightValue:delaySecondsString accessoryType:accessoryType];
 	}
 
-	MMTableViewCellInfo *payingCellInfo = [%c(MMTableViewCellInfo) normalCellForSel:@selector(payingToAuthor) target:self title:@"打赏" rightValue:@"支持作者的开发" accessoryType:1];	
-	MMTableViewCellInfo *blogCellInfo = [%c(MMTableViewCellInfo) normalCellForSel:@selector(visitingBlog) target:self title:@"作者博客" rightValue:@"查看更多文章" accessoryType:1];
-	
+	MMTableViewCellInfo *payingCellInfo = [%c(MMTableViewCellInfo) normalCellForSel:@selector(payingToAuthor) target:self title:@"打赏" rightValue:@"支持作者开发" accessoryType:1];	
+
 	[sectionInfo addCell:cellInfo];
 	[sectionInfo addCell:delayCellInfo];
 	[sectionInfo addCell:payingCellInfo];
-	[sectionInfo addCell:blogCellInfo];
 
 	[tableViewInfo insertSection:sectionInfo At:0];	
 
@@ -126,12 +124,6 @@
 - (void)payingToAuthor {
 	XGPayingViewController *payingViewController = [[XGPayingViewController alloc] init];
 	[self.navigationController PushViewController:payingViewController animated:YES];
-}
-
-%new
-- (void)visitingBlog {
-	 NSURL *blogUrl = [NSURL URLWithString:@"http://www.swiftyper.com"];
-    [[UIApplication sharedApplication] openURL:blogUrl];
 }
 
 %new
