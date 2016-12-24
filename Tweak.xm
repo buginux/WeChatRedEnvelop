@@ -43,8 +43,12 @@
 				params[@"nativeUrl"] = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl] ?: @"";
 				params[@"sessionUserName"] = redEnvelopInChatRoomFromMe ? wrap.m_nsToUsr : wrap.m_nsFromUsr;
 
-				WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
-				[logicMgr OpenRedEnvelopesRequest:params];
+				NSInteger delaySeconds = [[NSUserDefaults standardUserDefaults] integerForKey:@"XGDelaySecondsKey"];
+	
+				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+					WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
+					[logicMgr OpenRedEnvelopesRequest:params];
+				});
 			}
 		}	
 		break;
@@ -66,8 +70,21 @@
 	MMTableViewSectionInfo *sectionInfo = [%c(MMTableViewSectionInfo) sectionInfoDefaut];
 	
 	BOOL redEnvelopSwitchOn = [[NSUserDefaults standardUserDefaults] boolForKey:@"XGWeChatRedEnvelopSwitchKey"];
-	MMTableViewCellInfo *cellInfo = [%c(MMTableViewCellInfo) switchCellForSel:@selector(switchRedEnvelop:) target:self title:@"抢红包开关" on:redEnvelopSwitchOn];
+	NSInteger delaySeconds = [[NSUserDefaults standardUserDefaults] integerForKey:@"XGDelaySecondsKey"];
+
+	MMTableViewCellInfo *cellInfo = [%c(MMTableViewCellInfo) switchCellForSel:@selector(switchRedEnvelop:) target:self title:@"自动抢红包" on:redEnvelopSwitchOn];
+	NSString *delaySecondsString = delaySeconds == 0 ? @"不延迟" : [NSString stringWithFormat:@"%ld 秒", (long)delaySeconds];
+	NSInteger accessoryType = 1;
+
+	MMTableViewCellInfo *delayCellInfo;
+	if (!redEnvelopSwitchOn) {
+		delayCellInfo = [%c(MMTableViewCellInfo) normalCellForTitle:@"随机延迟" rightValue:@"自动抢红包已关闭"];
+	} else {
+		delayCellInfo = [%c(MMTableViewCellInfo) normalCellForSel:@selector(settingDelay) target:self title:@"随机延迟" rightValue:delaySecondsString accessoryType:accessoryType];
+	}
+
 	[sectionInfo addCell:cellInfo];
+	[sectionInfo addCell:delayCellInfo];
 
 	[tableViewInfo insertSection:sectionInfo At:0];	
 
@@ -77,15 +94,38 @@
 
 %new
 - (void)switchRedEnvelop:(UISwitch *)envelopSwitch {
-	NSString *kRedEnvelopSwitchKey = @"XGWeChatRedEnvelopSwitchKey";
-
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
-	if (envelopSwitch.on) {
-    	[defaults setBool:YES forKey:kRedEnvelopSwitchKey];
-	} else {
-		[defaults setBool:NO forKey:kRedEnvelopSwitchKey];
-	}
+    [defaults setBool:envelopSwitch.on forKey:@"XGWeChatRedEnvelopSwitchKey"];
+
+    [self reloadTableData];
+}
+
+%new 
+- (void)settingDelay {
+	UIAlertView *alert = [UIAlertView new];
+    alert.title = @"随机延迟(秒)";
+    
+    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+    alert.delegate = self;
+    [alert addButtonWithTitle:@"取消"];
+    [alert addButtonWithTitle:@"确定"];
+    
+    [alert textFieldAtIndex:0].placeholder = @"延迟时长";
+    [alert textFieldAtIndex:0].keyboardType = UIKeyboardTypeNumberPad;
+    [alert show];
+}
+
+%new
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (buttonIndex == 1) {
+    	NSString *delaySecondsString = [alertView textFieldAtIndex:0].text;
+    	NSInteger delaySeconds = [delaySecondsString integerValue];
+
+    	[[NSUserDefaults standardUserDefaults] setInteger:delaySeconds forKey:@"XGDelaySecondsKey"];
+
+    	[self reloadTableData];
+    }
 }
 
 %end
