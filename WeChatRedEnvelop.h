@@ -124,9 +124,24 @@
 
 @end
 
-@interface NewSettingViewController
+@interface NewSettingViewController: UINavigationController
 
 - (void)reloadTableData;
 
 @end
 
+@interface UINavigationController (LogicController)
+
+- (void)PushViewController:(id)arg1 animated:(_Bool)arg2;
+
+@end
+
+@interface ScanQRCodeLogicController: NSObject
+
+@property(nonatomic) unsigned int fromScene;
+- (id)initWithViewController:(id)arg1 CodeType:(int)arg2;
+- (void)tryScanOnePicture:(id)arg1;
+- (void)doScanQRCode:(id)arg1;
+- (void)showScanResult;
+
+@end
