@@ -16,7 +16,7 @@
 
 使用方法：“我的” - “设置”
 
-![RedEnvelopDelay](./ScreenShots/RedEnvelopDelay.png)
+![RedEnvelopDelay](./ScreenShots/RedEnvelopDelayNew.png)
 
 ### 2016-12-23 更新：
 
