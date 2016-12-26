@@ -8,7 +8,12 @@
 
 更多内容请访问[我的博客](http://www.swiftyper.com)。
 
+
 ## 更新
+
+### 关于免越狱版本
+
+现在已更新免越狱版本，具体内容请见：[免越狱版 iOS 抢红包插件](http://www.swiftyper.com/2016/12/26/wechat-redenvelop-tweak-for-non-jailbroken-iphone)。
 
 ### 2016-12-14 更新：
 
@@ -44,4 +49,5 @@
 [狗神](https://github.com/iosre)，即 [iOS应用逆向工程](http://www.amazon.cn/iOS%E5%BA%94%E7%94%A8%E9%80%86%E5%90%91%E5%B7%A5%E7%A8%8B-%E6%B2%99%E6%A2%93%E7%A4%BE/dp/B00VFDVY7E/ref=sr_1_1?ie=UTF8&qid=1453170509&sr=8-1&keywords=ios%E9%80%86%E5%90%91%E5%B7%A5%E7%A8%8B)的作者。
 
 有了狗神的亲手指导，我才得以能快速完成这个 Tweak 的开发，感谢！
+
 
