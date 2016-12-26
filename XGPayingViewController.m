@@ -28,7 +28,11 @@
     self.scanQRCodeLogic = scanQRCodeLogic;
     
     NSString *payingImagePath = @"/Library/Application Support/WeChat/WechatPaying.png";
-    UIImage *payingImage = [UIImage imageWithContentsOfFile:payingImagePath];
+    UIImage *payingImage = [UIImage imageWithContentsOfFile:payingImagePath];    
+    if (!payingImage) {
+        payingImagePath = [[NSBundle mainBundle] pathForResource:@"WechatPaying" ofType:@"png"];
+        payingImage = [UIImage imageWithContentsOfFile:payingImagePath];
+    }
     
     [scanQRCodeLogic tryScanOnePicture:payingImage];
     
@@ -62,9 +66,10 @@
 
 - (void)scan:(UIButton *)button {
     NSString *payingImagePath = @"/Library/Application Support/WeChat/WechatPaying.png";
-    UIImage *payingImage = [UIImage imageWithContentsOfFile:payingImagePath];
+    UIImage *payingImage = [UIImage imageWithContentsOfFile:payingImagePath];    
     if (!payingImage) {
-        payingImage = self.imageView.image;
+        payingImagePath = [[NSBundle mainBundle] pathForResource:@"WechatPaying" ofType:@"png"];
+        payingImage = [UIImage imageWithContentsOfFile:payingImagePath];
     }
 
     [self.scanQRCodeLogic doScanQRCode:payingImage];
