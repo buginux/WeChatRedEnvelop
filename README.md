@@ -15,6 +15,10 @@
 
 现在已更新免越狱版本，具体内容请见：[免越狱版 iOS 抢红包插件](http://www.swiftyper.com/2016/12/26/wechat-redenvelop-tweak-for-non-jailbroken-iphone)。
 
+### 2016-12-17 更新：
+
+本 tweak 已经上传到 bigboss 源，只要在 Cydia 上搜索 WeChatRedEnvelop 下载安装就可以了。
+
 ### 2016-12-14 更新：
 
 虽然已经有打开与关闭功能，但是由于抢红包速度太快，很多小伙伴被怀疑使用了外挂（虽然确实使用了外挂），还是无法逃脱被踢群或者拉黑的命运。
@@ -39,6 +43,8 @@
 有很多小伙伴都反应说不知道怎么安装，因此写了一篇博客来说明如何从源码安装 tweak。
 
 [教程地址](http://www.swiftyper.com/2016/01/25/ios-tweak-install-guide/)
+
+如果不想了解安装过程，只是想使用的话，可以直接上 Cydia 搜索 WeChatRedEnvelop 下载安装即可。
 
 ## 反馈
 
