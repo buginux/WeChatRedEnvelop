@@ -95,6 +95,53 @@
 - (void)safeSetObject:(id)arg1 forKey:(id)arg2;
 @end
 
+@interface MMTableViewInfo
+
+- (id)getTableView;
+- (void)addSection:(id)arg1;
+- (void)insertSection:(id)arg1 At:(unsigned int)arg2;
+
+@end
+
+@interface MMTableViewSectionInfo
+
++ (id)sectionInfoDefaut;
+- (void)addCell:(id)arg1;
+
+@end
+
+@interface MMTableViewCellInfo
+
++ (id)normalCellForSel:(SEL)arg1 target:(id)arg2 title:(id)arg3 accessoryType:(long long)arg4;
++ (id)switchCellForSel:(SEL)arg1 target:(id)arg2 title:(id)arg3 on:(_Bool)arg4;
++ (id)normalCellForSel:(SEL)arg1 target:(id)arg2 title:(id)arg3 rightValue:(id)arg4 accessoryType:(long long)arg5;
++ (id)normalCellForTitle:(id)arg1 rightValue:(id)arg2;
+
+@end
 
 
+@interface MMTableView: UITableView
 
+@end
+
+@interface NewSettingViewController: UINavigationController
+
+- (void)reloadTableData;
+
+@end
+
+@interface UINavigationController (LogicController)
+
+- (void)PushViewController:(id)arg1 animated:(_Bool)arg2;
+
+@end
+
+@interface ScanQRCodeLogicController: NSObject
+
+@property(nonatomic) unsigned int fromScene;
+- (id)initWithViewController:(id)arg1 CodeType:(int)arg2;
+- (void)tryScanOnePicture:(id)arg1;
+- (void)doScanQRCode:(id)arg1;
+- (void)showScanResult;
+
+@end
