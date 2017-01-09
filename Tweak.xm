@@ -77,6 +77,12 @@
 	NSString *delaySecondsString = delaySeconds == 0 ? @"不延迟" : [NSString stringWithFormat:@"%ld 秒", (long)delaySeconds];
 	NSInteger accessoryType = 1;
 
+	//kkadd
+	BOOL isLockScreenOn = [[NSUserDefaults standardUserDefaults] boolForKey:@"XGWeChatRedEnvelopLockScreenKey"];
+	MMTableViewCellInfo *lockCell = [%c(MMTableViewCellInfo) switchCellForSel:@selector(switchISLockScreen:) target:self title:@"禁止锁屏" on:isLockScreenOn];
+       	[UIApplication sharedApplication].idleTimerDisabled = isLockScreenOn;
+
+
 	MMTableViewCellInfo *delayCellInfo;
 	if (!redEnvelopSwitchOn) {
 		delayCellInfo = [%c(MMTableViewCellInfo) normalCellForTitle:@"随机延迟" rightValue:@"自动抢红包已关闭"];
@@ -87,6 +93,7 @@
 	MMTableViewCellInfo *payingCellInfo = [%c(MMTableViewCellInfo) normalCellForSel:@selector(payingToAuthor) target:self title:@"打赏" rightValue:@"支持作者开发" accessoryType:1];	
 
 	[sectionInfo addCell:cellInfo];
+	[sectionInfo addCell:lockCell];
 	[sectionInfo addCell:delayCellInfo];
 	[sectionInfo addCell:payingCellInfo];
 
@@ -101,6 +108,17 @@
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
     [defaults setBool:envelopSwitch.on forKey:@"XGWeChatRedEnvelopSwitchKey"];
+
+    [self reloadTableData];
+}
+
+%new
+- (void)switchISLockScreen:(UISwitch *)islockScreenOn {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    [UIApplication sharedApplication].idleTimerDisabled = islockScreenOn.on;
+
+    [defaults setBool:islockScreenOn.on forKey:@"XGWeChatRedEnvelopLockScreenKey"];
 
     [self reloadTableData];
 }
