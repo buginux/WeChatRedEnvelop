@@ -1,9 +1,9 @@
 Package: com.swiftyper.wechatredenvelop
 Name: WeChatRedEnvelop
 Depends: mobilesubstrate
-Version: 0.0.1
+Version: 0.1.2
 Architecture: iphoneos-arm
-Description: This tweak can't make you rich!
-Maintainer: wordbeyond
-Author: wordbeyond
+Description: 微信抢红包插件
+Maintainer: 请叫我小锅
+Author: 请叫我小锅
 Section: http://www.swiftyper.com
