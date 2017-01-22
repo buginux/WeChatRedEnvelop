@@ -66,6 +66,7 @@
 
 @interface WCRedEnvelopesLogicMgr: NSObject
 - (void)OpenRedEnvelopesRequest:(id)params;
+- (void)ReceiverQueryRedEnvelopesRequest:(id)arg1;
 @end
 
 @interface MMMsgLogicManager: NSObject
@@ -143,5 +144,23 @@
 - (void)tryScanOnePicture:(id)arg1;
 - (void)doScanQRCode:(id)arg1;
 - (void)showScanResult;
+
+@end
+
+@interface NSString (NSString_SBJSON)
+- (id)JSONArray;
+- (id)JSONDictionary;
+- (id)JSONValue;
+@end
+
+@interface SKBuiltinBuffer_t : NSObject
+
+@property(retain, nonatomic) NSData *buffer; // @dynamic buffer;
+
+@end
+
+@interface HongBaoRes : NSObject
+
+@property(retain, nonatomic) SKBuiltinBuffer_t *retText; // @dynamic retText;
 
 @end

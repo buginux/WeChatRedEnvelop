@@ -1,5 +1,36 @@
 #import "WeChatRedEnvelop.h"
 #import "XGPayingViewController.h"
+#import "WeChatRedEnvelopParam.h"
+
+%hook WCRedEnvelopesLogicMgr
+
+- (void)OnWCToHongbaoCommonResponse:(HongBaoRes *)arg1 Request:(id)arg2 { %log; %orig;
+
+	NSString *string = [[NSString alloc] initWithData:arg1.retText.buffer encoding:NSUTF8StringEncoding];
+	NSDictionary *dictionary = [string JSONDictionary];
+
+	// 没有这个字段会被判定为使用外挂
+	if (!dictionary[@"timingIdentifier"]) { return; }
+
+	WeChatRedEnvelopParam *mgrParams = [WeChatRedEnvelopParam sharedInstance];
+	if (mgrParams.redEnvelopSwitchOn && (mgrParams.redEnvelopInChatRoomFromOther || mgrParams.redEnvelopInChatRoomFromMe)) {
+		mgrParams.timingIdentifier = dictionary[@"timingIdentifier"];
+
+		// NSString *message = [NSString stringWithFormat:@"%@", [mgrParams toParams]];
+	 //   	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+	 //   	[alert show];
+
+		NSInteger delaySeconds = [[NSUserDefaults standardUserDefaults] integerForKey:@"XGDelaySecondsKey"];
+		NSUInteger randomSeconds = arc4random_uniform(delaySeconds);
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(randomSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+			WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
+			[logicMgr OpenRedEnvelopesRequest:[mgrParams toParams]];
+		});
+	}
+}
+
+%end
+
 
 %hook CMessageMgr
 - (void)AsyncOnAddMsg:(NSString *)msg MsgWrap:(CMessageWrap *)wrap {
@@ -18,6 +49,8 @@
 
 		if ([wrap.m_nsContent rangeOfString:@"wxpay://"].location != NSNotFound) { // 红包
 			
+			WeChatRedEnvelopParam *mgrParams = [WeChatRedEnvelopParam sharedInstance];
+
 			// 是否打开红包开关
 			BOOL redEnvelopSwitchOn = [[NSUserDefaults standardUserDefaults] boolForKey:@"XGWeChatRedEnvelopSwitchKey"];
 
@@ -31,25 +64,30 @@
 
 				NSString *nativeUrl = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl];
 				nativeUrl = [nativeUrl substringFromIndex:[@"wxpay://c2cbizmessagehandler/hongbao/receivehongbao?" length]];
-
 				NSDictionary *nativeUrlDict = [%c(WCBizUtil) dictionaryWithDecodedComponets:nativeUrl separator:@"&"];
 
-				/** 构造参数 */
+				WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
+				
 				NSMutableDictionary *params = [@{} mutableCopy];
-				params[@"msgType"] = nativeUrlDict[@"msgtype"] ?: @"1";
-				params[@"sendId"] = nativeUrlDict[@"sendid"] ?: @"";
+				params[@"agreeDuty"] = @"0";
 				params[@"channelId"] = nativeUrlDict[@"channelid"] ?: @"1";
-				params[@"nickName"] = [selfContact getContactDisplayName] ?: @"小锅";
-				params[@"headImg"] = [selfContact m_nsHeadImgUrl] ?: @"";
+				params[@"inWay"] = @"0";
+				params[@"msgType"] = nativeUrlDict[@"msgtype"] ?: @"1";
 				params[@"nativeUrl"] = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl] ?: @"";
-				params[@"sessionUserName"] = redEnvelopInChatRoomFromMe ? wrap.m_nsToUsr : wrap.m_nsFromUsr;
+				params[@"sendId"] = nativeUrlDict[@"sendid"] ?: @"";
 
-				NSInteger delaySeconds = [[NSUserDefaults standardUserDefaults] integerForKey:@"XGDelaySecondsKey"];
-	
-				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-					WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
-					[logicMgr OpenRedEnvelopesRequest:params];
-				});
+				[logicMgr ReceiverQueryRedEnvelopesRequest:params];
+
+				mgrParams.msgType = nativeUrlDict[@"msgtype"] ?: @"1";
+				mgrParams.sendId = nativeUrlDict[@"sendid"] ?: @"";
+				mgrParams.channelId = nativeUrlDict[@"channelid"] ?: @"1";
+				mgrParams.nickName = [selfContact getContactDisplayName] ?: @"小锅";
+				mgrParams.headImg = [selfContact m_nsHeadImgUrl] ?: @"";
+				mgrParams.nativeUrl = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl] ?: @"";
+				mgrParams.sessionUserName = redEnvelopInChatRoomFromMe ? wrap.m_nsToUsr : wrap.m_nsFromUsr;
+				mgrParams.redEnvelopSwitchOn = redEnvelopSwitchOn;
+				mgrParams.redEnvelopInChatRoomFromMe = redEnvelopInChatRoomFromMe;
+				mgrParams.redEnvelopInChatRoomFromOther = redEnvelopInChatRoomFromOther;
 			}
 		}	
 		break;
