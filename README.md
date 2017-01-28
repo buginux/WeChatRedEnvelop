@@ -27,7 +27,7 @@ Don't Panic。
 
 太多人跟我要注入完成后的版本了，实在没办法一个一个回，我就直接在这里给出下载地址吧。
 
-* 微信 6.5.4 版本：链接: https://pan.baidu.com/s/1boAwMHh 密码: 4iut
+* 微信 6.5.4 版本：链接: https://pan.baidu.com/s/1kUH8njD 密码: 6n2d
  
 ## 更新
 
