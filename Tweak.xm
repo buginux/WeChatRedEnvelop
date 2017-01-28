@@ -4,7 +4,17 @@
 
 %hook WCRedEnvelopesLogicMgr
 
-- (void)OnWCToHongbaoCommonResponse:(HongBaoRes *)arg1 Request:(id)arg2 { %log; %orig;
+- (void)OnWCToHongbaoCommonResponse:(HongBaoRes *)arg1 Request:(id)arg2 {
+
+	%orig;
+
+	WeChatRedEnvelopParam *mgrParams = [WeChatRedEnvelopParam sharedInstance];
+	
+	// 如果不是自动抢红包，则无需继续
+	if (!mgrParams.autoReceiveRedEnvelop) { return; }
+
+	// 重置标志
+	mgrParams.autoReceiveRedEnvelop = NO;
 
 	NSString *string = [[NSString alloc] initWithData:arg1.retText.buffer encoding:NSUTF8StringEncoding];
 	NSDictionary *dictionary = [string JSONDictionary];
@@ -12,7 +22,6 @@
 	// 没有这个字段会被判定为使用外挂
 	if (!dictionary[@"timingIdentifier"]) { return; }
 
-	WeChatRedEnvelopParam *mgrParams = [WeChatRedEnvelopParam sharedInstance];
 	if (mgrParams.redEnvelopSwitchOn && (mgrParams.redEnvelopInChatRoomFromOther || mgrParams.redEnvelopInChatRoomFromMe)) {
 		mgrParams.timingIdentifier = dictionary[@"timingIdentifier"];
 
@@ -30,7 +39,6 @@
 }
 
 %end
-
 
 %hook CMessageMgr
 - (void)AsyncOnAddMsg:(NSString *)msg MsgWrap:(CMessageWrap *)wrap {
@@ -88,6 +96,7 @@
 				mgrParams.redEnvelopSwitchOn = redEnvelopSwitchOn;
 				mgrParams.redEnvelopInChatRoomFromMe = redEnvelopInChatRoomFromMe;
 				mgrParams.redEnvelopInChatRoomFromOther = redEnvelopInChatRoomFromOther;
+				mgrParams.autoReceiveRedEnvelop = YES;
 			}
 		}	
 		break;
