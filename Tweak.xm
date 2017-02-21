@@ -30,8 +30,8 @@
 	 //   	[alert show];
 
 		NSInteger delaySeconds = [[NSUserDefaults standardUserDefaults] integerForKey:@"XGDelaySecondsKey"];
-		NSUInteger randomSeconds = arc4random_uniform(delaySeconds);
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(randomSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+		// NSUInteger randomSeconds = arc4random_uniform(delaySeconds);
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
 			WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
 			[logicMgr OpenRedEnvelopesRequest:[mgrParams toParams]];
 		});
@@ -126,9 +126,9 @@
 
 	MMTableViewCellInfo *delayCellInfo;
 	if (!redEnvelopSwitchOn) {
-		delayCellInfo = [%c(MMTableViewCellInfo) normalCellForTitle:@"随机延迟" rightValue:@"自动抢红包已关闭"];
+		delayCellInfo = [%c(MMTableViewCellInfo) normalCellForTitle:@"延迟抢红包" rightValue:@"自动抢红包已关闭"];
 	} else {
-		delayCellInfo = [%c(MMTableViewCellInfo) normalCellForSel:@selector(settingDelay) target:self title:@"随机延迟" rightValue:delaySecondsString accessoryType:accessoryType];
+		delayCellInfo = [%c(MMTableViewCellInfo) normalCellForSel:@selector(settingDelay) target:self title:@"延迟抢红包" rightValue:delaySecondsString accessoryType:accessoryType];
 	}
 
 	MMTableViewCellInfo *payingCellInfo = [%c(MMTableViewCellInfo) normalCellForSel:@selector(payingToAuthor) target:self title:@"打赏" rightValue:@"支持作者开发" accessoryType:1];	
@@ -155,7 +155,7 @@
 %new 
 - (void)settingDelay {
 	UIAlertView *alert = [UIAlertView new];
-    alert.title = @"随机延迟(秒)";
+    alert.title = @"延迟抢红包(秒)";
     
     alert.alertViewStyle = UIAlertViewStylePlainTextInput;
     alert.delegate = self;
@@ -169,6 +169,12 @@
 
 %new
 - (void)payingToAuthor {
+	// ScanQRCodeLogicController *scanQRCodeLogic = [[%c(ScanQRCodeLogicController) alloc] initWithViewController:self CodeType:3];
+ //    scanQRCodeLogic.fromScene = 2;
+
+ //    NewQRCodeScanner *qrCodeScanner = [[%c(NewQRCodeScanner) alloc] initWithDelegate:scanQRCodeLogic CodeType:3];
+ //    [qrCodeScanner notifyResult:@"https://wx.tenpay.com/f2f?t=AQAAABxXiDaVyoYdR5F1zBNM5jI%3D" type:@"QR_CODE" version:6];
+
 	XGPayingViewController *payingViewController = [[XGPayingViewController alloc] init];
 	[self.navigationController PushViewController:payingViewController animated:YES];
 }
