@@ -1,3 +1,18 @@
+#pragma mark - Util
+
+@interface WCBizUtil : NSObject
+
++ (id)dictionaryWithDecodedComponets:(id)arg1 separator:(id)arg2;
+
+@end
+
+@interface SKBuiltinBuffer_t : NSObject
+
+@property(retain, nonatomic) NSData *buffer; // @dynamic buffer;
+
+@end
+
+#pragma mark - Message
 
 @interface WCPayInfoItem: NSObject
 
@@ -42,12 +57,6 @@
 
 @end
 
-//@interface MMMsgLogicManager: NSObject
-//
-//- (id)GetCurrentLogicController;
-//
-//@end
-
 #pragma mark - RedEnvelop
 
 @interface WCRedEnvelopesControlData : NSObject
@@ -63,9 +72,9 @@
 
 @end
 
-@interface WCBizUtil : NSObject
+@interface HongBaoRes : NSObject
 
-+ (id)dictionaryWithDecodedComponets:(id)arg1 separator:(id)arg2;
+@property(retain, nonatomic) SKBuiltinBuffer_t *retText; // @dynamic retText;
 
 @end
 
@@ -87,17 +96,8 @@
 
 @end
 
-@interface NewSettingViewController: UINavigationController
 
-- (void)reloadTableData;
-
-@end
-
-@interface UINavigationController (LogicController)
-
-- (void)PushViewController:(id)arg1 animated:(_Bool)arg2;
-
-@end
+#pragma mark - QRCode
 
 @interface ScanQRCodeLogicController: NSObject
 
@@ -116,25 +116,12 @@
 
 @end
 
-
-
-@interface SKBuiltinBuffer_t : NSObject
-
-@property(retain, nonatomic) NSData *buffer; // @dynamic buffer;
-
-@end
-
-@interface HongBaoRes : NSObject
-
-@property(retain, nonatomic) SKBuiltinBuffer_t *retText; // @dynamic retText;
-
-@end
-
 #pragma mark - MMTableView
 
 @interface MMTableViewInfo
 
 - (id)getTableView;
+- (void)clearAllSection;
 - (void)addSection:(id)arg1;
 - (void)insertSection:(id)arg1 At:(unsigned int)arg2;
 
@@ -160,7 +147,7 @@
 
 @end
 
-#pragma mark - Category
+#pragma mark - UtilCategory
 
 @interface NSMutableDictionary (SafeInsert)
 
@@ -173,5 +160,30 @@
 - (id)JSONArray;
 - (id)JSONDictionary;
 - (id)JSONValue;
+
+@end
+
+#pragma mark - UICategory
+
+@interface NSObject (Loading)
+
+- (void)startLoadingBlocked;
+- (void)startLoadingNonBlock;
+- (void)startLoadingWithText:(id)arg1;
+- (void)stopLoading;
+- (void)stopLoadingWithFailText:(id)arg1;
+- (void)stopLoadingWithOKText:(id)arg1;
+
+@end
+
+@interface UINavigationController (LogicController)
+
+- (void)PushViewController:(id)arg1 animated:(_Bool)arg2;
+
+@end
+
+@interface NewSettingViewController: UINavigationController
+
+- (void)reloadTableData;
 
 @end

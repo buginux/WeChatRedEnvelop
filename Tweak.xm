@@ -1,6 +1,6 @@
 #import "WeChatRedEnvelop.h"
-#import "XGPayingViewController.h"
 #import "WeChatRedEnvelopParam.h"
+#import "WBSettingViewController.h"
 
 %hook WCRedEnvelopesLogicMgr
 
@@ -116,79 +116,20 @@
 	MMTableViewInfo *tableViewInfo = MSHookIvar<id>(self, "m_tableViewInfo");
 
 	MMTableViewSectionInfo *sectionInfo = [%c(MMTableViewSectionInfo) sectionInfoDefaut];
-	
-	BOOL redEnvelopSwitchOn = [[NSUserDefaults standardUserDefaults] boolForKey:@"XGWeChatRedEnvelopSwitchKey"];
-	NSInteger delaySeconds = [[NSUserDefaults standardUserDefaults] integerForKey:@"XGDelaySecondsKey"];
 
-	MMTableViewCellInfo *cellInfo = [%c(MMTableViewCellInfo) switchCellForSel:@selector(switchRedEnvelop:) target:self title:@"自动抢红包" on:redEnvelopSwitchOn];
-	NSString *delaySecondsString = delaySeconds == 0 ? @"不延迟" : [NSString stringWithFormat:@"%ld 秒", (long)delaySeconds];
-	NSInteger accessoryType = 1;
+	MMTableViewCellInfo *settingCell = [%c(MMTableViewCellInfo) normalCellForSel:@selector(setting) target:self title:@"红包助手" accessoryType:1];
+	[sectionInfo addCell:settingCell];
 
-	MMTableViewCellInfo *delayCellInfo;
-	if (!redEnvelopSwitchOn) {
-		delayCellInfo = [%c(MMTableViewCellInfo) normalCellForTitle:@"延迟抢红包" rightValue:@"自动抢红包已关闭"];
-	} else {
-		delayCellInfo = [%c(MMTableViewCellInfo) normalCellForSel:@selector(settingDelay) target:self title:@"延迟抢红包" rightValue:delaySecondsString accessoryType:accessoryType];
-	}
-
-	MMTableViewCellInfo *payingCellInfo = [%c(MMTableViewCellInfo) normalCellForSel:@selector(payingToAuthor) target:self title:@"打赏" rightValue:@"支持作者开发" accessoryType:1];	
-
-	[sectionInfo addCell:cellInfo];
-	[sectionInfo addCell:delayCellInfo];
-	[sectionInfo addCell:payingCellInfo];
-
-	[tableViewInfo insertSection:sectionInfo At:0];	
+	[tableViewInfo insertSection:sectionInfo At:0];
 
 	MMTableView *tableView = [tableViewInfo getTableView];
 	[tableView reloadData];
 }
 
 %new
-- (void)switchRedEnvelop:(UISwitch *)envelopSwitch {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
-    [defaults setBool:envelopSwitch.on forKey:@"XGWeChatRedEnvelopSwitchKey"];
-
-    [self reloadTableData];
-}
-
-%new 
-- (void)settingDelay {
-	UIAlertView *alert = [UIAlertView new];
-    alert.title = @"延迟抢红包(秒)";
-    
-    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-    alert.delegate = self;
-    [alert addButtonWithTitle:@"取消"];
-    [alert addButtonWithTitle:@"确定"];
-    
-    [alert textFieldAtIndex:0].placeholder = @"延迟时长";
-    [alert textFieldAtIndex:0].keyboardType = UIKeyboardTypeNumberPad;
-    [alert show];
-}
-
-%new
-- (void)payingToAuthor {
-	// ScanQRCodeLogicController *scanQRCodeLogic = [[%c(ScanQRCodeLogicController) alloc] initWithViewController:self CodeType:3];
- //    scanQRCodeLogic.fromScene = 2;
-
- //    NewQRCodeScanner *qrCodeScanner = [[%c(NewQRCodeScanner) alloc] initWithDelegate:scanQRCodeLogic CodeType:3];
- //    [qrCodeScanner notifyResult:@"https://wx.tenpay.com/f2f?t=AQAAABxXiDaVyoYdR5F1zBNM5jI%3D" type:@"QR_CODE" version:6];
-
-	XGPayingViewController *payingViewController = [[XGPayingViewController alloc] init];
-	[self.navigationController PushViewController:payingViewController animated:YES];
-}
-
-%new
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    if (buttonIndex == 1) {
-    	NSString *delaySecondsString = [alertView textFieldAtIndex:0].text;
-    	NSInteger delaySeconds = [delaySecondsString integerValue];
-
-    	[[NSUserDefaults standardUserDefaults] setInteger:delaySeconds forKey:@"XGDelaySecondsKey"];
-
-    	[self reloadTableData];
-    }
+- (void)setting {
+	WBSettingViewController *settingViewController = [WBSettingViewController new];
+	[self.navigationController PushViewController:settingViewController animated:YES];
 }
 
 %end
