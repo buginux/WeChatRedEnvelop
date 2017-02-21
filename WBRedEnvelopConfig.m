@@ -8,6 +8,8 @@
 
 #import "WBRedEnvelopConfig.h"
 
+static NSString * const kDelaySecondsKey = @"XGDelaySecondsKey";
+
 @implementation WBRedEnvelopConfig
 
 + (instancetype)sharedConfig {
@@ -15,16 +17,24 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         config = [WBRedEnvelopConfig new];
+        
     });
     return config;
 }
 
-- (void)loadFromDisk {
-    
+- (instancetype)init {
+    if (self = [super init]) {
+        _delaySeconds = [[NSUserDefaults standardUserDefaults] integerForKey:kDelaySecondsKey];
+    }
+    return self;
 }
 
-- (void)storeToDisk {
+
+- (void)setDelaySeconds:(NSInteger)delaySeconds {
+    _delaySeconds = delaySeconds;
     
+    [[NSUserDefaults standardUserDefaults] setInteger:delaySeconds forKey:kDelaySecondsKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 @end

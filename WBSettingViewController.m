@@ -49,7 +49,7 @@
     MMTableViewSectionInfo *sectionInfo = [SectionInfoClass sectionInfoDefaut];
     
      BOOL redEnvelopSwitchOn = [[NSUserDefaults standardUserDefaults] boolForKey:@"XGWeChatRedEnvelopSwitchKey"];
-     NSInteger delaySeconds = [[NSUserDefaults standardUserDefaults] integerForKey:@"XGDelaySecondsKey"];
+    NSInteger delaySeconds = [WBRedEnvelopConfig sharedConfig].delaySeconds;
     
      MMTableViewCellInfo *cellInfo = [CellInfoClass switchCellForSel:@selector(switchRedEnvelop:) target:self title:@"自动抢红包" on:redEnvelopSwitchOn];
      NSString *delaySecondsString = delaySeconds == 0 ? @"不延迟" : [NSString stringWithFormat:@"%ld 秒", (long)delaySeconds];
@@ -112,7 +112,7 @@
         NSString *delaySecondsString = [alertView textFieldAtIndex:0].text;
         NSInteger delaySeconds = [delaySecondsString integerValue];
         
-        [[NSUserDefaults standardUserDefaults] setInteger:delaySeconds forKey:@"XGDelaySecondsKey"];
+        [WBRedEnvelopConfig sharedConfig].delaySeconds = delaySeconds;
         
         [self reloadTableData];
     }

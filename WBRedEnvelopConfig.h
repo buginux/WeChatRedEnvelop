@@ -12,7 +12,7 @@
 
 + (instancetype)sharedConfig;
 
-- (void)loadFromDisk;
-- (void)storeToDisk;
+@property (assign, nonatomic) BOOL autoReceiveEnable;
+@property (assign, nonatomic) NSInteger delaySeconds;
 
 @end
