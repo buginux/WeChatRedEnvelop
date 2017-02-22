@@ -9,6 +9,7 @@
 #import "WBSettingViewController.h"
 #import "WeChatRedEnvelop.h"
 #import "WBRedEnvelopConfig.h"
+#import <objc/runtime.h>
 
 @interface WBSettingViewController ()
 
@@ -36,48 +37,53 @@
     [self.view addSubview:tableView];
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-}
-
 - (void)reloadTableData {
     [self.tableViewInfo clearAllSection];
     
-    Class SectionInfoClass = NSClassFromString(@"MMTableViewSectionInfo");
-    Class CellInfoClass = NSClassFromString(@"MMTableViewCellInfo");
-    
-    MMTableViewSectionInfo *sectionInfo = [SectionInfoClass sectionInfoDefaut];
-    
-     BOOL redEnvelopSwitchOn = [[NSUserDefaults standardUserDefaults] boolForKey:@"XGWeChatRedEnvelopSwitchKey"];
-    NSInteger delaySeconds = [WBRedEnvelopConfig sharedConfig].delaySeconds;
-    
-     MMTableViewCellInfo *cellInfo = [CellInfoClass switchCellForSel:@selector(switchRedEnvelop:) target:self title:@"自动抢红包" on:redEnvelopSwitchOn];
-     NSString *delaySecondsString = delaySeconds == 0 ? @"不延迟" : [NSString stringWithFormat:@"%ld 秒", (long)delaySeconds];
-     NSInteger accessoryType = 1;
-    
-     MMTableViewCellInfo *delayCellInfo;
-     if (!redEnvelopSwitchOn) {
-     	delayCellInfo = [CellInfoClass normalCellForTitle:@"延迟抢红包" rightValue:@"自动抢红包已关闭"];
-     } else {
-     	delayCellInfo = [CellInfoClass normalCellForSel:@selector(settingDelay) target:self title:@"延迟抢红包" rightValue:delaySecondsString accessoryType:accessoryType];
-     }
-    
-     MMTableViewCellInfo *payingCellInfo = [CellInfoClass normalCellForSel:@selector(payingToAuthor) target:self title:@"打赏" rightValue:@"支持作者开发" accessoryType:1];
-    
-     [sectionInfo addCell:cellInfo];
-     [sectionInfo addCell:delayCellInfo];
-     [sectionInfo addCell:payingCellInfo];
-    
-     [self.tableViewInfo insertSection:sectionInfo At:0];
+    [self addBasicSettingSection];
     
     MMTableView *tableView = [self.tableViewInfo getTableView];
     [tableView reloadData];
 }
 
-- (void)switchRedEnvelop:(UISwitch *)envelopSwitch {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+#pragma mark - BasicSetting
+
+- (void)addBasicSettingSection {
+    Class SectionInfoClass = NSClassFromString(@"MMTableViewSectionInfo");
     
-    [defaults setBool:envelopSwitch.on forKey:@"XGWeChatRedEnvelopSwitchKey"];
+    MMTableViewSectionInfo *sectionInfo = [SectionInfoClass sectionInfoDefaut];
+    
+    [sectionInfo addCell:[self createAutoReceiveRedEnvelopCell]];
+    
+    if ([WBRedEnvelopConfig sharedConfig].autoReceiveEnable) {
+        [sectionInfo addCell:[self createDelaySettingCell]];
+    }
+    
+    [sectionInfo addCell:[self createPayingCell]];
+    
+    [self.tableViewInfo insertSection:sectionInfo At:0];
+}
+
+- (MMTableViewCellInfo *)createAutoReceiveRedEnvelopCell {
+    Class CellInfoClass = NSClassFromString(@"MMTableViewCellInfo");
+    return [CellInfoClass switchCellForSel:@selector(switchRedEnvelop:) target:self title:@"自动抢红包" on:[WBRedEnvelopConfig sharedConfig].autoReceiveEnable];
+}
+
+- (MMTableViewCellInfo *)createDelaySettingCell {
+    Class CellInfoClass = NSClassFromString(@"MMTableViewCellInfo");
+    
+    NSInteger delaySeconds = [WBRedEnvelopConfig sharedConfig].delaySeconds;
+    return [CellInfoClass normalCellForSel:@selector(settingDelay) target:self title:@"延迟抢红包" rightValue:[NSString stringWithFormat:@"%ld 秒", (long)delaySeconds] accessoryType:1];
+}
+
+- (MMTableViewCellInfo *)createPayingCell {
+    Class CellInfoClass = NSClassFromString(@"MMTableViewCellInfo");
+    
+    return [CellInfoClass normalCellForSel:@selector(payingToAuthor) target:self title:@"打赏" rightValue:@"支持作者开发" accessoryType:1];
+}
+
+- (void)switchRedEnvelop:(UISwitch *)envelopSwitch {
+    [WBRedEnvelopConfig sharedConfig].autoReceiveEnable = envelopSwitch.on;
     
     [self reloadTableData];
 }
@@ -117,5 +123,7 @@
         [self reloadTableData];
     }
 }
+
+#pragma mark - ProSetting
 
 @end

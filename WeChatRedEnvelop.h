@@ -57,6 +57,13 @@
 
 @end
 
+@interface MMLanguageMgr: NSObject
+
+- (id)getStringForCurLanguage:(id)arg1 defaultTo:(id)arg2;
+
+
+@end
+
 #pragma mark - RedEnvelop
 
 @interface WCRedEnvelopesControlData : NSObject
@@ -147,6 +154,21 @@
 
 @end
 
+#pragma mark - UI
+@interface MMLoadingView : UIView
+
+@property(retain, nonatomic) UILabel *m_label; // @synthesize m_label;
+@property (assign, nonatomic) BOOL m_bIgnoringInteractionEventsWhenLoading; // @synthesize m_bIgnoringInteractionEventsWhenLoading;
+
+- (void)setFitFrame:(long long)arg1;
+- (void)startLoading;
+- (void)stopLoading;
+- (void)stopLoadingAndShowError:(id)arg1;
+- (void)stopLoadingAndShowOK:(id)arg1;
+
+
+@end
+
 #pragma mark - UtilCategory
 
 @interface NSMutableDictionary (SafeInsert)
@@ -164,17 +186,6 @@
 @end
 
 #pragma mark - UICategory
-
-@interface NSObject (Loading)
-
-- (void)startLoadingBlocked;
-- (void)startLoadingNonBlock;
-- (void)startLoadingWithText:(id)arg1;
-- (void)stopLoading;
-- (void)stopLoadingWithFailText:(id)arg1;
-- (void)stopLoadingWithOKText:(id)arg1;
-
-@end
 
 @interface UINavigationController (LogicController)
 

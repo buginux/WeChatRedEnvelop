@@ -6,8 +6,8 @@
 //  Copyright © 2017年 swiftyper. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "WBBaseViewController.h"
 
-@interface WBSettingViewController : UIViewController
+@interface WBSettingViewController : WBBaseViewController
 
 @end

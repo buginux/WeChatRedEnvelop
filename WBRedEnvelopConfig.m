@@ -9,6 +9,7 @@
 #import "WBRedEnvelopConfig.h"
 
 static NSString * const kDelaySecondsKey = @"XGDelaySecondsKey";
+static NSString * const kAutoReceiveRedEnvelopKey = @"XGWeChatRedEnvelopSwitchKey";
 
 @implementation WBRedEnvelopConfig
 
@@ -25,15 +26,22 @@ static NSString * const kDelaySecondsKey = @"XGDelaySecondsKey";
 - (instancetype)init {
     if (self = [super init]) {
         _delaySeconds = [[NSUserDefaults standardUserDefaults] integerForKey:kDelaySecondsKey];
+        _autoReceiveEnable = [[NSUserDefaults standardUserDefaults] boolForKey:kAutoReceiveRedEnvelopKey];
     }
     return self;
 }
-
 
 - (void)setDelaySeconds:(NSInteger)delaySeconds {
     _delaySeconds = delaySeconds;
     
     [[NSUserDefaults standardUserDefaults] setInteger:delaySeconds forKey:kDelaySecondsKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)setAutoReceiveEnable:(BOOL)autoReceiveEnable {
+    _autoReceiveEnable = autoReceiveEnable;
+    
+    [[NSUserDefaults standardUserDefaults] setBool:autoReceiveEnable forKey:kAutoReceiveRedEnvelopKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
