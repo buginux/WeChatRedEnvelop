@@ -10,6 +10,7 @@
 
 static NSString * const kDelaySecondsKey = @"XGDelaySecondsKey";
 static NSString * const kAutoReceiveRedEnvelopKey = @"XGWeChatRedEnvelopSwitchKey";
+static NSString * const kSerialReceiveKey = @"WBSerialReceiveKey";
 
 @implementation WBRedEnvelopConfig
 
@@ -18,7 +19,6 @@ static NSString * const kAutoReceiveRedEnvelopKey = @"XGWeChatRedEnvelopSwitchKe
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         config = [WBRedEnvelopConfig new];
-        
     });
     return config;
 }
@@ -27,6 +27,7 @@ static NSString * const kAutoReceiveRedEnvelopKey = @"XGWeChatRedEnvelopSwitchKe
     if (self = [super init]) {
         _delaySeconds = [[NSUserDefaults standardUserDefaults] integerForKey:kDelaySecondsKey];
         _autoReceiveEnable = [[NSUserDefaults standardUserDefaults] boolForKey:kAutoReceiveRedEnvelopKey];
+        _serialReceive = [[NSUserDefaults standardUserDefaults] boolForKey:kSerialReceiveKey];
     }
     return self;
 }
@@ -42,6 +43,13 @@ static NSString * const kAutoReceiveRedEnvelopKey = @"XGWeChatRedEnvelopSwitchKe
     _autoReceiveEnable = autoReceiveEnable;
     
     [[NSUserDefaults standardUserDefaults] setBool:autoReceiveEnable forKey:kAutoReceiveRedEnvelopKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)setSerialReceive:(BOOL)serialReceive {
+    _serialReceive = serialReceive;
+    
+    [[NSUserDefaults standardUserDefaults] setBool:serialReceive forKey:kSerialReceiveKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

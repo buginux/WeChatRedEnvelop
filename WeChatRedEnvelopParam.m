@@ -10,17 +10,6 @@
 
 @implementation WeChatRedEnvelopParam
 
-+ (instancetype)sharedInstance {
-    static WeChatRedEnvelopParam *sharedInstance;
-    
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        sharedInstance = [[WeChatRedEnvelopParam alloc] init];
-    });
-    
-    return sharedInstance;
-}
-
 - (NSDictionary *)toParams {
     return @{
              @"msgType": self.msgType,

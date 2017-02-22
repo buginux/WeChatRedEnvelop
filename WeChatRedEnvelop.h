@@ -78,6 +78,8 @@
 - (void)ReceiverQueryRedEnvelopesRequest:(id)arg1;
 - (void)GetHongbaoBusinessRequest:(id)arg1 CMDID:(unsigned int)arg2 OutputType:(unsigned int)arg3;
 
+/** Added Methods */
+- (unsigned int)calculateDelaySeconds;
 
 @end
 
@@ -146,6 +148,7 @@
 @interface MMTableViewSectionInfo
 
 + (id)sectionInfoDefaut;
++ (id)sectionInfoHeader:(id)arg1;
 - (void)addCell:(id)arg1;
 
 @end

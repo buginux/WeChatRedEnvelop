@@ -10,8 +10,6 @@
 
 @interface WeChatRedEnvelopParam : NSObject
 
-+ (instancetype)sharedInstance;
-
 - (NSDictionary *)toParams;
 
 @property (assign, nonatomic) BOOL redEnvelopSwitchOn;

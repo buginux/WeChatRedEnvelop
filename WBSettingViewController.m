@@ -39,6 +39,7 @@
     [self.tableViewInfo clearAllSection];
     
     [self addBasicSettingSection];
+    [self addAdvanceSettingSection];
     
     MMTableView *tableView = [self.tableViewInfo getTableView];
     [tableView reloadData];
@@ -57,8 +58,9 @@
     
     [sectionInfo addCell:[self createPayingCell]];
     
-    [self.tableViewInfo insertSection:sectionInfo At:0];
+    [self.tableViewInfo addSection:sectionInfo];
 }
+
 
 - (MMTableViewCellInfo *)createAutoReceiveRedEnvelopCell {
     return [objc_getClass("MMTableViewCellInfo") switchCellForSel:@selector(switchRedEnvelop:) target:self title:@"自动抢红包" on:[WBRedEnvelopConfig sharedConfig].autoReceiveEnable];
@@ -113,5 +115,21 @@
 }
 
 #pragma mark - ProSetting
+- (void)addAdvanceSettingSection {
+    MMTableViewSectionInfo *sectionInfo = [objc_getClass("MMTableViewSectionInfo") sectionInfoHeader:@"高级功能"];
+    
+    [sectionInfo addCell:[self createQueueCell]];
+    
+    [self.tableViewInfo addSection:sectionInfo];
+}
+
+- (MMTableViewCellInfo *)createQueueCell {
+    return [objc_getClass("MMTableViewCellInfo") switchCellForSel:@selector(settingReceiveByQueue:) target:self title:@"队列领取" on:[WBRedEnvelopConfig sharedConfig].serialReceive];
+}
+            
+- (void)settingReceiveByQueue:(UISwitch *)queueSwitch {
+    [WBRedEnvelopConfig sharedConfig].serialReceive = queueSwitch.on;
+}
+
 
 @end

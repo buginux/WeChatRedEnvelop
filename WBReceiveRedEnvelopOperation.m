@@ -16,7 +16,9 @@
 
 @property (assign, nonatomic, getter=isExecuting) BOOL executing;
 @property (assign, nonatomic, getter=isFinished) BOOL finished;
+
 @property (strong, nonatomic) WeChatRedEnvelopParam *redEnvelopParam;
+@property (assign, nonatomic) unsigned int delaySeconds;
 
 @end
 
@@ -25,9 +27,10 @@
 @synthesize executing = _executing;
 @synthesize finished = _finished;
 
-- (instancetype)initWithRedEnvelopParam:(WeChatRedEnvelopParam *)param {
+- (instancetype)initWithRedEnvelopParam:(WeChatRedEnvelopParam *)param delay:(unsigned int)delaySeconds {
     if (self = [super init]) {
         _redEnvelopParam = param;
+        _delaySeconds = delaySeconds;
     }
     return self;
 }
@@ -46,10 +49,11 @@
 }
 
 - (void)main {
-    sleep((unsigned int)[WBRedEnvelopConfig sharedConfig].delaySeconds);
+    sleep(self.delaySeconds);
     
-    WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
-    [logicMgr OpenRedEnvelopesRequest:[self.redEnvelopParam toParams]];
+//    WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
+//    [logicMgr OpenRedEnvelopesRequest:[self.redEnvelopParam toParams]];
+    NSLog(@"****** 拆开红包");
     
     self.finished = YES;
     self.executing = NO;

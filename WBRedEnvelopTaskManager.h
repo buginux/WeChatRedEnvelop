@@ -13,6 +13,9 @@
 
 + (instancetype)sharedManager;
 
-- (void)addTask:(WBReceiveRedEnvelopOperation *)task;
+- (void)addNormalTask:(WBReceiveRedEnvelopOperation *)task;
+- (void)addSerialTask:(WBReceiveRedEnvelopOperation *)task;
+
+- (BOOL)serialQueueIsEmpty;
 
 @end

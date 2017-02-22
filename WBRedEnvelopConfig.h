@@ -13,6 +13,8 @@
 + (instancetype)sharedConfig;
 
 @property (assign, nonatomic) BOOL autoReceiveEnable;
+@property (assign, nonatomic) BOOL serialReceive;
+
 @property (assign, nonatomic) NSInteger delaySeconds;
 
 @end

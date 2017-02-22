@@ -6,7 +6,7 @@ TARGET = iphone:latest:7.0
 include theos/makefiles/common.mk
 
 TWEAK_NAME = WeChatRedEnvelop
-WeChatRedEnvelop_FILES = Tweak.xm WBBaseViewController.m WBSettingViewController.m WBRedEnvelopConfig.m WeChatRedEnvelopParam.m WBReceiveRedEnvelopOperation.m WBRedEnvelopTaskManager.m
+WeChatRedEnvelop_FILES = Tweak.xm WBBaseViewController.m WBSettingViewController.m WBRedEnvelopConfig.m WeChatRedEnvelopParam.m WBReceiveRedEnvelopOperation.m WBRedEnvelopTaskManager.m WBRedEnvelopParamQueue.m
 WeChatRedEnvelop_FRAMEWORKS = UIKit
 
 include $(THEOS_MAKE_PATH)/tweak.mk

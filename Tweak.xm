@@ -3,6 +3,8 @@
 #import "WBSettingViewController.h"
 #import "WBReceiveRedEnvelopOperation.h"
 #import "WBRedEnvelopTaskManager.h"
+#import "WBRedEnvelopConfig.h"
+#import "WBRedEnvelopParamQueue.h"
 
 %hook WCRedEnvelopesLogicMgr
 
@@ -10,21 +12,62 @@
 
 	%orig;
 
-	if (arg1.cgiCmdid != 3) { return; }
+	NSLog(@"vvvvvvvvvvv - 红包请求返回");
+	if (arg1.cgiCmdid != 3) {
+		NSLog(@"vvvvvvvvvvv - 非查询参数的请求，直接返回");
+		return;	
+	}
 
-	WeChatRedEnvelopParam *mgrParams = [WeChatRedEnvelopParam sharedInstance];
+	if ([WBRedEnvelopParamQueue sharedQueue].isEmpty) {
+		return;
+	}
+
+	NSLog(@"vvvvvvvvvvv - 手动抢还是自动抢?");
+	NSLog(@"vvvvvvvvvvv - 自动抢红包");
+
+	WeChatRedEnvelopParam *mgrParams = [[WBRedEnvelopParamQueue sharedQueue] dequeue];
 
 	NSString *string = [[NSString alloc] initWithData:arg1.retText.buffer encoding:NSUTF8StringEncoding];
 	NSDictionary *dictionary = [string JSONDictionary];
 
-	// 没有这个字段会被判定为使用外挂
+	// // NSString *message = [NSString stringWithFormat:@"%@", dictionary];
+ // //    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Title" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+ // //    [alert show];
+
+	// // 没有这个字段会被判定为使用外挂
 	if (!dictionary[@"timingIdentifier"]) { return; }
 
 	if (mgrParams.redEnvelopSwitchOn && (mgrParams.redEnvelopInChatRoomFromOther || mgrParams.redEnvelopInChatRoomFromMe)) {
 		mgrParams.timingIdentifier = dictionary[@"timingIdentifier"];
 
-		WBReceiveRedEnvelopOperation *operation = [[WBReceiveRedEnvelopOperation alloc] initWithRedEnvelopParam:mgrParams];
-		[[WBRedEnvelopTaskManager sharedManager] addTask:operation];
+		unsigned int delaySeconds = [self calculateDelaySeconds];
+		WBReceiveRedEnvelopOperation *operation = [[WBReceiveRedEnvelopOperation alloc] initWithRedEnvelopParam:mgrParams delay:delaySeconds];
+
+		if ([WBRedEnvelopConfig sharedConfig].serialReceive) {
+			[[WBRedEnvelopTaskManager sharedManager] addSerialTask:operation];
+			NSLog(@"队列抢红包 ****** 接到红包，延迟 %u 秒", delaySeconds);
+		} else {
+			[[WBRedEnvelopTaskManager sharedManager] addNormalTask:operation];
+			NSLog(@"普通抢红包 ****** 接到红包");
+		}
+	}
+}
+
+%new
+- (unsigned int)calculateDelaySeconds {
+	NSInteger configDelaySeconds = [WBRedEnvelopConfig sharedConfig].delaySeconds;
+
+	if ([WBRedEnvelopConfig sharedConfig].serialReceive) {
+		unsigned int serialDelaySeconds;
+		if ([WBRedEnvelopTaskManager sharedManager].serialQueueIsEmpty) {
+			serialDelaySeconds = configDelaySeconds;
+		} else {
+			serialDelaySeconds = 15;
+		}
+
+		return serialDelaySeconds;
+	} else {
+		return (unsigned int)configDelaySeconds;
 	}
 }
 
@@ -46,11 +89,9 @@
 		}
 
 		if ([wrap.m_nsContent rangeOfString:@"wxpay://"].location != NSNotFound) { // 红包
-			
-			WeChatRedEnvelopParam *mgrParams = [WeChatRedEnvelopParam sharedInstance];
 
 			// 是否打开红包开关
-			BOOL redEnvelopSwitchOn = [[NSUserDefaults standardUserDefaults] boolForKey:@"XGWeChatRedEnvelopSwitchKey"];
+			BOOL redEnvelopSwitchOn = [WBRedEnvelopConfig sharedConfig].autoReceiveEnable;
 
 			// 群聊中，别人发红包
 			BOOL redEnvelopInChatRoomFromOther = ([wrap.m_nsFromUsr rangeOfString:@"@chatroom"].location != NSNotFound);
@@ -76,6 +117,7 @@
 
 				[logicMgr ReceiverQueryRedEnvelopesRequest:params];
 
+				WeChatRedEnvelopParam *mgrParams = [[WeChatRedEnvelopParam alloc] init];
 				mgrParams.msgType = nativeUrlDict[@"msgtype"] ?: @"1";
 				mgrParams.sendId = nativeUrlDict[@"sendid"] ?: @"";
 				mgrParams.channelId = nativeUrlDict[@"channelid"] ?: @"1";
@@ -86,6 +128,8 @@
 				mgrParams.redEnvelopSwitchOn = redEnvelopSwitchOn;
 				mgrParams.redEnvelopInChatRoomFromMe = redEnvelopInChatRoomFromMe;
 				mgrParams.redEnvelopInChatRoomFromOther = redEnvelopInChatRoomFromOther;
+
+				[[WBRedEnvelopParamQueue sharedQueue] enqueue:mgrParams];
 			}
 		}	
 		break;
