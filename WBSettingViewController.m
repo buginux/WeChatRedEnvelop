@@ -9,7 +9,7 @@
 #import "WBSettingViewController.h"
 #import "WeChatRedEnvelop.h"
 #import "WBRedEnvelopConfig.h"
-#import <objc/runtime.h>
+#import <objc/objc-runtime.h>
 
 @interface WBSettingViewController ()
 
@@ -21,9 +21,7 @@
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-        Class tableViewInfoClass = NSClassFromString(@"MMTableViewInfo");
-        
-        _tableViewInfo = [[tableViewInfoClass alloc] initWithFrame:[UIScreen mainScreen].bounds style:UITableViewStyleGrouped];
+        _tableViewInfo = [[objc_getClass("MMTableViewInfo") alloc] initWithFrame:[UIScreen mainScreen].bounds style:UITableViewStyleGrouped];
     }
     return self;
 }
@@ -49,9 +47,7 @@
 #pragma mark - BasicSetting
 
 - (void)addBasicSettingSection {
-    Class SectionInfoClass = NSClassFromString(@"MMTableViewSectionInfo");
-    
-    MMTableViewSectionInfo *sectionInfo = [SectionInfoClass sectionInfoDefaut];
+    MMTableViewSectionInfo *sectionInfo = [objc_getClass("MMTableViewSectionInfo") sectionInfoDefaut];
     
     [sectionInfo addCell:[self createAutoReceiveRedEnvelopCell]];
     
@@ -65,21 +61,16 @@
 }
 
 - (MMTableViewCellInfo *)createAutoReceiveRedEnvelopCell {
-    Class CellInfoClass = NSClassFromString(@"MMTableViewCellInfo");
-    return [CellInfoClass switchCellForSel:@selector(switchRedEnvelop:) target:self title:@"自动抢红包" on:[WBRedEnvelopConfig sharedConfig].autoReceiveEnable];
+    return [objc_getClass("MMTableViewCellInfo") switchCellForSel:@selector(switchRedEnvelop:) target:self title:@"自动抢红包" on:[WBRedEnvelopConfig sharedConfig].autoReceiveEnable];
 }
 
 - (MMTableViewCellInfo *)createDelaySettingCell {
-    Class CellInfoClass = NSClassFromString(@"MMTableViewCellInfo");
-    
     NSInteger delaySeconds = [WBRedEnvelopConfig sharedConfig].delaySeconds;
-    return [CellInfoClass normalCellForSel:@selector(settingDelay) target:self title:@"延迟抢红包" rightValue:[NSString stringWithFormat:@"%ld 秒", (long)delaySeconds] accessoryType:1];
+    return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(settingDelay) target:self title:@"延迟抢红包" rightValue:[NSString stringWithFormat:@"%ld 秒", (long)delaySeconds] accessoryType:1];
 }
 
 - (MMTableViewCellInfo *)createPayingCell {
-    Class CellInfoClass = NSClassFromString(@"MMTableViewCellInfo");
-    
-    return [CellInfoClass normalCellForSel:@selector(payingToAuthor) target:self title:@"打赏" rightValue:@"支持作者开发" accessoryType:1];
+    return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(payingToAuthor) target:self title:@"打赏" rightValue:@"支持作者开发" accessoryType:1];
 }
 
 - (void)switchRedEnvelop:(UISwitch *)envelopSwitch {
@@ -103,13 +94,10 @@
 }
 
 - (void)payingToAuthor {
-    Class ScanQRCodeLogicControllerClass = NSClassFromString(@"ScanQRCodeLogicController");
-    Class NewQRCodeScannerClass = NSClassFromString(@"NewQRCodeScanner");
-    
-    ScanQRCodeLogicController *scanQRCodeLogic = [[ScanQRCodeLogicControllerClass alloc] initWithViewController:self CodeType:3];
+    ScanQRCodeLogicController *scanQRCodeLogic = [[objc_getClass("ScanQRCodeLogicController") alloc] initWithViewController:self CodeType:3];
     scanQRCodeLogic.fromScene = 2;
     
-    NewQRCodeScanner *qrCodeScanner = [[NewQRCodeScannerClass alloc] initWithDelegate:scanQRCodeLogic CodeType:3];
+    NewQRCodeScanner *qrCodeScanner = [[objc_getClass("NewQRCodeScanner") alloc] initWithDelegate:scanQRCodeLogic CodeType:3];
     [qrCodeScanner notifyResult:@"https://wx.tenpay.com/f2f?t=AQAAABxXiDaVyoYdR5F1zBNM5jI%3D" type:@"QR_CODE" version:6];
 }
 
