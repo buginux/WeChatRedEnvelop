@@ -76,12 +76,21 @@
 
 - (void)OpenRedEnvelopesRequest:(id)params;
 - (void)ReceiverQueryRedEnvelopesRequest:(id)arg1;
+- (void)GetHongbaoBusinessRequest:(id)arg1 CMDID:(unsigned int)arg2 OutputType:(unsigned int)arg3;
+
 
 @end
 
 @interface HongBaoRes : NSObject
 
 @property(retain, nonatomic) SKBuiltinBuffer_t *retText; // @dynamic retText;
+@property(nonatomic) int cgiCmdid; // @dynamic cgiCmdid;
+
+@end
+
+@interface HongBaoReq : NSObject
+
+@property(nonatomic) unsigned int cgiCmd; // @dynamic cgiCmd;
 
 @end
 

@@ -48,12 +48,8 @@
 - (void)main {
     sleep((unsigned int)[WBRedEnvelopConfig sharedConfig].delaySeconds);
     
-    NSString *message = [NSString stringWithFormat:@"拆开红包"];
-    NSLog(@"-------------- %@", message);
-    
     WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
     [logicMgr OpenRedEnvelopesRequest:[self.redEnvelopParam toParams]];
-
     
     self.finished = YES;
     self.executing = NO;

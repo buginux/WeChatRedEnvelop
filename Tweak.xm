@@ -6,35 +6,26 @@
 
 %hook WCRedEnvelopesLogicMgr
 
-- (void)OnWCToHongbaoCommonResponse:(HongBaoRes *)arg1 Request:(id)arg2 {
+- (void)OnWCToHongbaoCommonResponse:(HongBaoRes *)arg1 Request:(HongBaoReq *)arg2 {
 
 	%orig;
 
-	NSLog(@"arg1 -- %@, arg2 -- %@", arg1, arg2);
+	if (arg1.cgiCmdid != 3) { return; }
 
-	// WeChatRedEnvelopParam *mgrParams = [WeChatRedEnvelopParam sharedInstance];
-	
-	// // 如果不是自动抢红包，则无需继续
-	// if (!mgrParams.autoReceiveRedEnvelop) { return; }
+	WeChatRedEnvelopParam *mgrParams = [WeChatRedEnvelopParam sharedInstance];
 
-	// // 重置标志
-	// mgrParams.autoReceiveRedEnvelop = NO;
+	NSString *string = [[NSString alloc] initWithData:arg1.retText.buffer encoding:NSUTF8StringEncoding];
+	NSDictionary *dictionary = [string JSONDictionary];
 
-	// NSString *string = [[NSString alloc] initWithData:arg1.retText.buffer encoding:NSUTF8StringEncoding];
-	// NSDictionary *dictionary = [string JSONDictionary];
+	// 没有这个字段会被判定为使用外挂
+	if (!dictionary[@"timingIdentifier"]) { return; }
 
-	// // 没有这个字段会被判定为使用外挂
-	// if (!dictionary[@"timingIdentifier"]) { return; }
+	if (mgrParams.redEnvelopSwitchOn && (mgrParams.redEnvelopInChatRoomFromOther || mgrParams.redEnvelopInChatRoomFromMe)) {
+		mgrParams.timingIdentifier = dictionary[@"timingIdentifier"];
 
-	// if (mgrParams.redEnvelopSwitchOn && (mgrParams.redEnvelopInChatRoomFromOther || mgrParams.redEnvelopInChatRoomFromMe)) {
-	// 	mgrParams.timingIdentifier = dictionary[@"timingIdentifier"];
-
-	// 	NSString *message = [NSString stringWithFormat:@"接到红包"];
- //    	NSLog(@"-------------- %@", message);
-
-	// 	WBReceiveRedEnvelopOperation *operation = [[WBReceiveRedEnvelopOperation alloc] initWithRedEnvelopParam:mgrParams];
-	// 	[[WBRedEnvelopTaskManager sharedManager] addTask:operation];
-	// }
+		WBReceiveRedEnvelopOperation *operation = [[WBReceiveRedEnvelopOperation alloc] initWithRedEnvelopParam:mgrParams];
+		[[WBRedEnvelopTaskManager sharedManager] addTask:operation];
+	}
 }
 
 %end
@@ -95,7 +86,6 @@
 				mgrParams.redEnvelopSwitchOn = redEnvelopSwitchOn;
 				mgrParams.redEnvelopInChatRoomFromMe = redEnvelopInChatRoomFromMe;
 				mgrParams.redEnvelopInChatRoomFromOther = redEnvelopInChatRoomFromOther;
-				mgrParams.autoReceiveRedEnvelop = YES;
 			}
 		}	
 		break;
