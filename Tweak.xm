@@ -1,6 +1,8 @@
 #import "WeChatRedEnvelop.h"
 #import "WeChatRedEnvelopParam.h"
 #import "WBSettingViewController.h"
+#import "WBReceiveRedEnvelopOperation.h"
+#import "WBRedEnvelopTaskManager.h"
 
 %hook WCRedEnvelopesLogicMgr
 
@@ -8,34 +10,31 @@
 
 	%orig;
 
-	WeChatRedEnvelopParam *mgrParams = [WeChatRedEnvelopParam sharedInstance];
+	NSLog(@"arg1 -- %@, arg2 -- %@", arg1, arg2);
+
+	// WeChatRedEnvelopParam *mgrParams = [WeChatRedEnvelopParam sharedInstance];
 	
-	// 如果不是自动抢红包，则无需继续
-	if (!mgrParams.autoReceiveRedEnvelop) { return; }
+	// // 如果不是自动抢红包，则无需继续
+	// if (!mgrParams.autoReceiveRedEnvelop) { return; }
 
-	// 重置标志
-	mgrParams.autoReceiveRedEnvelop = NO;
+	// // 重置标志
+	// mgrParams.autoReceiveRedEnvelop = NO;
 
-	NSString *string = [[NSString alloc] initWithData:arg1.retText.buffer encoding:NSUTF8StringEncoding];
-	NSDictionary *dictionary = [string JSONDictionary];
+	// NSString *string = [[NSString alloc] initWithData:arg1.retText.buffer encoding:NSUTF8StringEncoding];
+	// NSDictionary *dictionary = [string JSONDictionary];
 
-	// 没有这个字段会被判定为使用外挂
-	if (!dictionary[@"timingIdentifier"]) { return; }
+	// // 没有这个字段会被判定为使用外挂
+	// if (!dictionary[@"timingIdentifier"]) { return; }
 
-	if (mgrParams.redEnvelopSwitchOn && (mgrParams.redEnvelopInChatRoomFromOther || mgrParams.redEnvelopInChatRoomFromMe)) {
-		mgrParams.timingIdentifier = dictionary[@"timingIdentifier"];
+	// if (mgrParams.redEnvelopSwitchOn && (mgrParams.redEnvelopInChatRoomFromOther || mgrParams.redEnvelopInChatRoomFromMe)) {
+	// 	mgrParams.timingIdentifier = dictionary[@"timingIdentifier"];
 
-		// NSString *message = [NSString stringWithFormat:@"%@", [mgrParams toParams]];
-	 //   	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-	 //   	[alert show];
+	// 	NSString *message = [NSString stringWithFormat:@"接到红包"];
+ //    	NSLog(@"-------------- %@", message);
 
-		NSInteger delaySeconds = [[NSUserDefaults standardUserDefaults] integerForKey:@"XGDelaySecondsKey"];
-		// NSUInteger randomSeconds = arc4random_uniform(delaySeconds);
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-			WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
-			[logicMgr OpenRedEnvelopesRequest:[mgrParams toParams]];
-		});
-	}
+	// 	WBReceiveRedEnvelopOperation *operation = [[WBReceiveRedEnvelopOperation alloc] initWithRedEnvelopParam:mgrParams];
+	// 	[[WBRedEnvelopTaskManager sharedManager] addTask:operation];
+	// }
 }
 
 %end

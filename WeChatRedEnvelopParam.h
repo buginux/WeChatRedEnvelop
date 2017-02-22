@@ -14,8 +14,8 @@
 
 - (NSDictionary *)toParams;
 
-/** 开关控制 */
-@property (assign, nonatomic) BOOL autoReceiveRedEnvelop; //:< 用于标记是否为自动抢红包
+/** 为了防止手动抢跟自己抢冲突，需要这个参数做标记 */
+@property (assign, nonatomic) BOOL autoReceiveRedEnvelop;
 @property (assign, nonatomic) BOOL redEnvelopSwitchOn;
 @property (assign, nonatomic) BOOL redEnvelopInChatRoomFromOther;
 @property (assign, nonatomic) BOOL redEnvelopInChatRoomFromMe;
