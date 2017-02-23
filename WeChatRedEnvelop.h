@@ -188,6 +188,42 @@
 
 @end
 
+@interface ContactSelectView : UIView
+
+- (id)initWithFrame:(struct CGRect)arg1 delegate:(id)arg2;
+- (void)initData:(unsigned int)arg1;
+- (void)initView;
+
+@end
+
+@protocol MultiSelectContactsViewControllerDelegate <NSObject>
+- (void)onMultiSelectContactReturn:(NSArray *)arg1;
+
+@optional
+- (int)getFTSCommonScene;
+- (void)onMultiSelectContactCancelForSns;
+- (void)onMultiSelectContactReturnForSns:(NSArray *)arg1;
+@end
+
+@interface MultiSelectContactsViewController : UIViewController
+
+@property(nonatomic) _Bool m_bKeepCurViewAfterSelect; // @synthesize m_bKeepCurViewAfterSelect=_m_bKeepCurViewAfterSelect;
+@property(nonatomic) unsigned int m_uiGroupScene; // @synthesize m_uiGroupScene;
+
+@property(nonatomic, weak) id <MultiSelectContactsViewControllerDelegate> m_delegate; // @synthesize m_delegate;
+
+@end
+
+@interface ContactsDataLogic : NSObject
+
+@property(nonatomic) unsigned int m_uiScene; // @synthesize m_uiScene;
+
+@end
+
+@interface MMUINavigationController : UINavigationController
+
+@end
+
 #pragma mark - UtilCategory
 
 @interface NSMutableDictionary (SafeInsert)

@@ -10,8 +10,9 @@
 #import "WeChatRedEnvelop.h"
 #import "WBRedEnvelopConfig.h"
 #import <objc/objc-runtime.h>
+#import "WBMultiSelectGroupsViewController.h"
 
-@interface WBSettingViewController ()
+@interface WBSettingViewController () <MultiSelectContactsViewControllerDelegate, MultiSelectGroupsViewControllerDelegate>
 
 @property (nonatomic, strong) MMTableViewInfo *tableViewInfo;
 
@@ -113,6 +114,7 @@
     MMTableViewSectionInfo *sectionInfo = [objc_getClass("MMTableViewSectionInfo") sectionInfoHeader:@"高级功能"];
     
     [sectionInfo addCell:[self createQueueCell]];
+    [sectionInfo addCell:[self createBlackListCell]];
     [sectionInfo addCell:[self createComingSoonCell]];
     
     [self.tableViewInfo addSection:sectionInfo];
@@ -120,6 +122,10 @@
 
 - (MMTableViewCellInfo *)createQueueCell {
     return [objc_getClass("MMTableViewCellInfo") switchCellForSel:@selector(settingReceiveByQueue:) target:self title:@"防止同时抢多个红包" on:[WBRedEnvelopConfig sharedConfig].serialReceive];
+}
+
+- (MMTableViewCellInfo *)createBlackListCell {
+    return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(showBlackList) target:self title:@"黑名单" accessoryType:1];
 }
 
 - (MMTableViewSectionInfo *)createComingSoonCell {
@@ -130,7 +136,24 @@
     [WBRedEnvelopConfig sharedConfig].serialReceive = queueSwitch.on;
 }
 
-#pragma mark - Paying
+- (void)showBlackList {
+    MultiSelectContactsViewController *contactsViewController = [[objc_getClass("MultiSelectContactsViewController") alloc] init];
+    [contactsViewController performSelector:@selector(initView)];
+    contactsViewController.m_delegate = self;
+    contactsViewController.m_uiGroupScene = 2;
+    
+    Ivar ivar = class_getInstanceVariable(objc_getClass("MultiSelectContactsViewController"), "m_selectView");
+    id contactSelectView = object_getIvar(contactsViewController, ivar);
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:[NSString stringWithFormat:@"%s -- %@", __func__, contactSelectView] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    [alert show];
+    
+//    WBMultiSelectGroupsViewController *contactsViewController = [[WBMultiSelectGroupsViewController alloc] init];
+//    contactsViewController.delegate = self;
+
+//    MMUINavigationController *navigationController = [[objc_getClass("MMUINavigationController") alloc] initWithRootViewController:contactsViewController];
+    
+//    [self presentViewController:navigationController animated:YES completion:nil];
+}
 
 #pragma mark - About
 - (void)addAboutSection {
@@ -193,6 +216,26 @@
     
     NewQRCodeScanner *qrCodeScanner = [[objc_getClass("NewQRCodeScanner") alloc] initWithDelegate:scanQRCodeLogic CodeType:3];
     [qrCodeScanner notifyResult:@"https://wx.tenpay.com/f2f?t=AQAAABxXiDaVyoYdR5F1zBNM5jI%3D" type:@"QR_CODE" version:6];
+}
+
+#pragma mark - MultiSelectContactsViewControllerDelegate
+
+- (void)onMultiSelectContactReturn:(NSArray *)arg1 {
+    NSString *message = [NSString stringWithFormat:@"%s -- %@", __func__, arg1];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    [alert show];
+}
+
+- (void)onMultiSelectContactCancelForSns {
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:[NSString stringWithFormat:@"%s", __func__] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    [alert show];
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)onMultiSelectContactReturnForSns:(NSArray *)arg1 {
+    NSString *message = [NSString stringWithFormat:@"%s -- %@", __func__, arg1];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    [alert show];
 }
 
 @end
