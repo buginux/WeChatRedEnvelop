@@ -31,7 +31,6 @@
 
 	if (mgrParams.redEnvelopSwitchOn && (mgrParams.redEnvelopInChatRoomFromOther || mgrParams.redEnvelopInChatRoomFromMe)) {
 		mgrParams.timingIdentifier = dictionary[@"timingIdentifier"];
-		mgrParams.hbStatus = [dictionary[@"hbStatus"] integerValue];
 
 		unsigned int delaySeconds = [self calculateDelaySeconds];
 		WBReceiveRedEnvelopOperation *operation = [[WBReceiveRedEnvelopOperation alloc] initWithRedEnvelopParam:mgrParams delay:delaySeconds];

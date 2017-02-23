@@ -181,6 +181,12 @@
 
 @end
 
+@interface MMWebViewController: NSObject
+
+- (id)initWithURL:(id)arg1 presentModal:(_Bool)arg2 extraInfo:(id)arg3;
+
+@end
+
 #pragma mark - UtilCategory
 
 @interface NSMutableDictionary (SafeInsert)

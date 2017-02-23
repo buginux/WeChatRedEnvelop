@@ -40,6 +40,7 @@
     
     [self addBasicSettingSection];
     [self addAdvanceSettingSection];
+    [self addAboutSection];
     
     MMTableView *tableView = [self.tableViewInfo getTableView];
     [tableView reloadData];
@@ -131,5 +132,23 @@
     [WBRedEnvelopConfig sharedConfig].serialReceive = queueSwitch.on;
 }
 
+#pragma mark - About
+- (void)addAboutSection {
+    MMTableViewSectionInfo *sectionInfo = [objc_getClass("MMTableViewSectionInfo") sectionInfoHeader:@"关于"];
+    
+    [sectionInfo addCell:[self createIntroductionCell]];
+    
+    [self.tableViewInfo addSection:sectionInfo];
+}
+
+- (MMTableViewCellInfo *)createIntroductionCell {
+    return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(showIntroduction) target:self title:@"使用说明" accessoryType:1];
+}
+
+- (void)showIntroduction {
+    NSURL *introductionUrl = [NSURL URLWithString:@"http://www.swiftyper.com"];
+    MMWebViewController *webViewController = [[objc_getClass("MMWebViewController") alloc] initWithURL:introductionUrl presentModal:NO extraInfo:nil];
+    [self.navigationController PushViewController:webViewController animated:YES];
+}
 
 @end
