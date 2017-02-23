@@ -156,7 +156,7 @@
 }
 
 - (void)showIntroduction {
-    NSURL *introductionUrl = [NSURL URLWithString:@"http://www.swiftyper.com"];
+    NSURL *introductionUrl = [NSURL URLWithString:@"https://github.com/buginux/WeChatRedEnvelop/blob/RedEnvelopPro/Introduction/Introduction.md"];
     MMWebViewController *webViewController = [[objc_getClass("MMWebViewController") alloc] initWithURL:introductionUrl presentModal:NO extraInfo:nil];
     [self.navigationController PushViewController:webViewController animated:YES];
 }

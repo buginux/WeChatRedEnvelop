@@ -140,7 +140,7 @@
 
 	MMTableViewSectionInfo *sectionInfo = [%c(MMTableViewSectionInfo) sectionInfoDefaut];
 
-	MMTableViewCellInfo *settingCell = [%c(MMTableViewCellInfo) normalCellForSel:@selector(setting) target:self title:@"红包助手" accessoryType:1];
+	MMTableViewCellInfo *settingCell = [%c(MMTableViewCellInfo) normalCellForSel:@selector(setting) target:self title:@"红包小助手" accessoryType:1];
 	[sectionInfo addCell:settingCell];
 
 	[tableViewInfo insertSection:sectionInfo At:0];
