@@ -10,15 +10,22 @@
 
 	%orig;
 
+	// 非参数查询请求
 	if (arg1.cgiCmdid != 3) { return; }
+ 
+ 	NSString *string = [[NSString alloc] initWithData:arg1.retText.buffer encoding:NSUTF8StringEncoding];
+ 	NSDictionary *dictionary = [string JSONDictionary];
 
-	WeChatRedEnvelopParam *mgrParams = [WeChatRedEnvelopParam sharedInstance];
+	// 自己已经抢过
+	if ([dictionary[@"receiveStatus"] integerValue] == 2) { return; }
 
-	NSString *string = [[NSString alloc] initWithData:arg1.retText.buffer encoding:NSUTF8StringEncoding];
-	NSDictionary *dictionary = [string JSONDictionary];
+	// 红包被抢完
+	if ([dictionary[@"hbStatus"] integerValue] == 4) { return; }
 
 	// 没有这个字段会被判定为使用外挂
 	if (!dictionary[@"timingIdentifier"]) { return; }
+
+	WeChatRedEnvelopParam *mgrParams = [WeChatRedEnvelopParam sharedInstance];
 
 	if (mgrParams.redEnvelopSwitchOn && (mgrParams.redEnvelopInChatRoomFromOther || mgrParams.redEnvelopInChatRoomFromMe)) {
 		mgrParams.timingIdentifier = dictionary[@"timingIdentifier"];
