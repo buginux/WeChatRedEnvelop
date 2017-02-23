@@ -51,9 +51,8 @@
 - (void)main {
     sleep(self.delaySeconds);
     
-//    WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
-//    [logicMgr OpenRedEnvelopesRequest:[self.redEnvelopParam toParams]];
-    NSLog(@"****** 拆开红包");
+    WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
+    [logicMgr OpenRedEnvelopesRequest:[self.redEnvelopParam toParams]];
     
     self.finished = YES;
     self.executing = NO;

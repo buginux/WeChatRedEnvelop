@@ -12,43 +12,34 @@
 
 	%orig;
 
-	NSLog(@"vvvvvvvvvvv - 红包请求返回");
-	if (arg1.cgiCmdid != 3) {
-		NSLog(@"vvvvvvvvvvv - 非查询参数的请求，直接返回");
-		return;	
-	}
-
-	if ([WBRedEnvelopParamQueue sharedQueue].isEmpty) {
-		return;
-	}
-
-	NSLog(@"vvvvvvvvvvv - 手动抢还是自动抢?");
-	NSLog(@"vvvvvvvvvvv - 自动抢红包");
-
-	WeChatRedEnvelopParam *mgrParams = [[WBRedEnvelopParamQueue sharedQueue] dequeue];
+	// 非参数查询请求
+	if (arg1.cgiCmdid != 3) { return; }
 
 	NSString *string = [[NSString alloc] initWithData:arg1.retText.buffer encoding:NSUTF8StringEncoding];
 	NSDictionary *dictionary = [string JSONDictionary];
 
-	// // NSString *message = [NSString stringWithFormat:@"%@", dictionary];
- // //    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Title" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
- // //    [alert show];
+	// 自己已经抢过
+	if ([dictionary[@"receiveStatus"] integerValue] == 2) { return; }
 
-	// // 没有这个字段会被判定为使用外挂
+	// 红包被抢完
+	if ([dictionary[@"hbStatus"] integerValue] == 4) { return; }
+
+	// 没有这个字段会被判定为使用外挂
 	if (!dictionary[@"timingIdentifier"]) { return; }
+
+	WeChatRedEnvelopParam *mgrParams = [[WBRedEnvelopParamQueue sharedQueue] dequeue];
 
 	if (mgrParams.redEnvelopSwitchOn && (mgrParams.redEnvelopInChatRoomFromOther || mgrParams.redEnvelopInChatRoomFromMe)) {
 		mgrParams.timingIdentifier = dictionary[@"timingIdentifier"];
+		mgrParams.hbStatus = [dictionary[@"hbStatus"] integerValue];
 
 		unsigned int delaySeconds = [self calculateDelaySeconds];
 		WBReceiveRedEnvelopOperation *operation = [[WBReceiveRedEnvelopOperation alloc] initWithRedEnvelopParam:mgrParams delay:delaySeconds];
 
 		if ([WBRedEnvelopConfig sharedConfig].serialReceive) {
 			[[WBRedEnvelopTaskManager sharedManager] addSerialTask:operation];
-			NSLog(@"队列抢红包 ****** 接到红包，延迟 %u 秒", delaySeconds);
 		} else {
 			[[WBRedEnvelopTaskManager sharedManager] addNormalTask:operation];
-			NSLog(@"普通抢红包 ****** 接到红包");
 		}
 	}
 }
