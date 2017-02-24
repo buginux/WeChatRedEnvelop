@@ -92,7 +92,7 @@
 
 @interface HongBaoReq : NSObject
 
-@property(nonatomic) unsigned int cgiCmd; // @dynamic cgiCmd;
+@property(retain, nonatomic) SKBuiltinBuffer_t *reqText; // @dynamic reqText;
 
 @end
 
@@ -229,6 +229,18 @@
 @interface NSMutableDictionary (SafeInsert)
 
 - (void)safeSetObject:(id)arg1 forKey:(id)arg2;
+
+@end
+
+@interface NSDictionary (NSDictionary_SafeJSON)
+
+- (id)arrayForKey:(id)arg1;
+- (id)dictionaryForKey:(id)arg1;
+- (double)doubleForKey:(id)arg1;
+- (float)floatForKey:(id)arg1;
+- (long long)int64ForKey:(id)arg1;
+- (long long)integerForKey:(id)arg1;
+- (id)stringForKey:(id)arg1;
 
 @end
 

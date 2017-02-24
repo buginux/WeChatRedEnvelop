@@ -15,22 +15,38 @@
 	// 非参数查询请求
 	if (arg1.cgiCmdid != 3) { return; }
 
-	NSString *string = [[NSString alloc] initWithData:arg1.retText.buffer encoding:NSUTF8StringEncoding];
-	NSDictionary *dictionary = [string JSONDictionary];
+	NSString *(^parseRequestSign)() = ^NSString *() {
+		NSString *requestString = [[NSString alloc] initWithData:arg2.reqText.buffer encoding:NSUTF8StringEncoding];
+		NSDictionary *requestDictionary = [%c(WCBizUtil) dictionaryWithDecodedComponets:requestString separator:@"&"];
+		NSString *nativeUrl = [[requestDictionary stringForKey:@"nativeUrl"] stringByRemovingPercentEncoding];
+		NSDictionary *nativeUrlDict = [%c(WCBizUtil) dictionaryWithDecodedComponets:nativeUrl separator:@"&"];
 
-	// 自己已经抢过
-	if ([dictionary[@"receiveStatus"] integerValue] == 2) { return; }
+		return [nativeUrlDict stringForKey:@"sign"];
+	};
 
-	// 红包被抢完
-	if ([dictionary[@"hbStatus"] integerValue] == 4) { return; }
-
-	// 没有这个字段会被判定为使用外挂
-	if (!dictionary[@"timingIdentifier"]) { return; }
+	NSDictionary *responseDict = [[[NSString alloc] initWithData:arg1.retText.buffer encoding:NSUTF8StringEncoding] JSONDictionary];
 
 	WeChatRedEnvelopParam *mgrParams = [[WBRedEnvelopParamQueue sharedQueue] dequeue];
 
-	if (mgrParams.redEnvelopSwitchOn && (mgrParams.redEnvelopInChatRoomFromOther || mgrParams.redEnvelopInChatRoomFromMe)) {
-		mgrParams.timingIdentifier = dictionary[@"timingIdentifier"];
+	BOOL (^shouldReceiveRedEnvelop)() = ^BOOL() {
+
+		// 自己已经抢过
+		if ([responseDict[@"receiveStatus"] integerValue] == 2) { return NO; }
+
+		// 红包被抢完
+		if ([responseDict[@"hbStatus"] integerValue] == 4) { return NO; }
+
+		// 没有这个字段会被判定为使用外挂
+		if (!responseDict[@"timingIdentifier"]) { return NO; }
+
+		// 不是同一个请求
+		if (![parseRequestSign() isEqualToString:mgrParams.sign]) { return NO; }
+
+		return ([WBRedEnvelopConfig sharedConfig].autoReceiveEnable && (mgrParams.redEnvelopInChatRoomFromOther || mgrParams.redEnvelopInChatRoomFromMe));
+	};
+
+	if (shouldReceiveRedEnvelop()) {
+		mgrParams.timingIdentifier = responseDict[@"timingIdentifier"];
 
 		unsigned int delaySeconds = [self calculateDelaySeconds];
 		WBReceiveRedEnvelopOperation *operation = [[WBReceiveRedEnvelopOperation alloc] initWithRedEnvelopParam:mgrParams delay:delaySeconds];
@@ -70,56 +86,79 @@
 	switch(wrap.m_uiMessageType) {
 	case 49: { // AppNode
 
-		CContactMgr *contactManager = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("CContactMgr") class]];
-		CContact *selfContact = [contactManager getSelfContact];
+		/** 是否为红包消息 */
+		BOOL (^isRedEnvelopMessage)() = ^BOOL() {
+			return [wrap.m_nsContent rangeOfString:@"wxpay://"].location != NSNotFound;
+		};
+		
+		if (isRedEnvelopMessage()) { // 红包
+			CContactMgr *contactManager = [[%c(MMServiceCenter) defaultCenter] getService:[%c(CContactMgr) class]];
+			CContact *selfContact = [contactManager getSelfContact];
 
-		BOOL isMesasgeFromMe = NO;
-		if ([wrap.m_nsFromUsr isEqualToString:selfContact.m_nsUsrName]) {
-			isMesasgeFromMe = YES;
-		}
+			/** 是否为群聊 */
+			BOOL (^isGroupChat)() = ^BOOL() {
+				return [wrap.m_nsFromUsr rangeOfString:@"@chatroom"].location != NSNotFound;
+			};
 
-		if ([wrap.m_nsContent rangeOfString:@"wxpay://"].location != NSNotFound) { // 红包
+			/** 是否自己在群聊中发消息 */
+			BOOL (^isGroupSender)() = ^BOOL() {
+				BOOL isSender = NO;
+				if ([wrap.m_nsFromUsr isEqualToString:selfContact.m_nsUsrName]) {
+					isSender = YES;
+				}
 
-			// 是否打开红包开关
-			BOOL redEnvelopSwitchOn = [WBRedEnvelopConfig sharedConfig].autoReceiveEnable;
+				return isSender && isGroupChat();
+			};
 
-			// 群聊中，别人发红包
-			BOOL redEnvelopInChatRoomFromOther = ([wrap.m_nsFromUsr rangeOfString:@"@chatroom"].location != NSNotFound);
-			
-			// 群聊中，自己发红包
-			BOOL redEnvelopInChatRoomFromMe = (isMesasgeFromMe && ([wrap.m_nsToUsr rangeOfString:@"@chatroom"].location != NSNotFound));
+			/** 是否自动抢红包 */
+			BOOL (^shouldReceiveRedEnvelop)() = ^BOOL() {
+				if (![WBRedEnvelopConfig sharedConfig].autoReceiveEnable) { return NO; }
 
-			if (redEnvelopSwitchOn && (redEnvelopInChatRoomFromOther || redEnvelopInChatRoomFromMe)) {
+				return [WBRedEnvelopConfig sharedConfig].autoReceiveEnable && (isGroupChat() || isGroupSender());
+			};
 
-				NSString *nativeUrl = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl];
+			NSDictionary *(^parseNativeUrl)(NSString *nativeUrl) = ^(NSString *nativeUrl) {
 				nativeUrl = [nativeUrl substringFromIndex:[@"wxpay://c2cbizmessagehandler/hongbao/receivehongbao?" length]];
-				NSDictionary *nativeUrlDict = [%c(WCBizUtil) dictionaryWithDecodedComponets:nativeUrl separator:@"&"];
+				return [%c(WCBizUtil) dictionaryWithDecodedComponets:nativeUrl separator:@"&"];
+			};
 
-				WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
-				
+			/** 获取服务端验证参数 */
+			void (^queryRedEnvelopesReqeust)(NSDictionary *nativeUrlDict) = ^(NSDictionary *nativeUrlDict) {
 				NSMutableDictionary *params = [@{} mutableCopy];
 				params[@"agreeDuty"] = @"0";
-				params[@"channelId"] = nativeUrlDict[@"channelid"] ?: @"1";
+				params[@"channelId"] = [nativeUrlDict stringForKey:@"channelid"];
 				params[@"inWay"] = @"0";
-				params[@"msgType"] = nativeUrlDict[@"msgtype"] ?: @"1";
-				params[@"nativeUrl"] = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl] ?: @"";
-				params[@"sendId"] = nativeUrlDict[@"sendid"] ?: @"";
+				params[@"msgType"] = [nativeUrlDict stringForKey:@"msgtype"];
+				params[@"nativeUrl"] = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl];
+				params[@"sendId"] = [nativeUrlDict stringForKey:@"sendid"];
 
+				WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
 				[logicMgr ReceiverQueryRedEnvelopesRequest:params];
+			};
 
-				WeChatRedEnvelopParam *mgrParams = [[WeChatRedEnvelopParam alloc] init];
-				mgrParams.msgType = nativeUrlDict[@"msgtype"] ?: @"1";
-				mgrParams.sendId = nativeUrlDict[@"sendid"] ?: @"";
-				mgrParams.channelId = nativeUrlDict[@"channelid"] ?: @"1";
-				mgrParams.nickName = [selfContact getContactDisplayName] ?: @"小锅";
-				mgrParams.headImg = [selfContact m_nsHeadImgUrl] ?: @"";
-				mgrParams.nativeUrl = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl] ?: @"";
-				mgrParams.sessionUserName = redEnvelopInChatRoomFromMe ? wrap.m_nsToUsr : wrap.m_nsFromUsr;
-				mgrParams.redEnvelopSwitchOn = redEnvelopSwitchOn;
-				mgrParams.redEnvelopInChatRoomFromMe = redEnvelopInChatRoomFromMe;
-				mgrParams.redEnvelopInChatRoomFromOther = redEnvelopInChatRoomFromOther;
+			/** 储存参数 */
+			void (^enqueueParam)(NSDictionary *nativeUrlDict) = ^(NSDictionary *nativeUrlDict) {
+					WeChatRedEnvelopParam *mgrParams = [[WeChatRedEnvelopParam alloc] init];
+					mgrParams.msgType = [nativeUrlDict stringForKey:@"msgtype"];
+					mgrParams.sendId = [nativeUrlDict stringForKey:@"sendid"];
+					mgrParams.channelId = [nativeUrlDict stringForKey:@"channelid"];
+					mgrParams.nickName = [selfContact getContactDisplayName];
+					mgrParams.headImg = [selfContact m_nsHeadImgUrl];
+					mgrParams.nativeUrl = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl];
+					mgrParams.sessionUserName = isGroupSender() ? wrap.m_nsToUsr : wrap.m_nsFromUsr;
+					mgrParams.sign = [nativeUrlDict stringForKey:@"sign"];
+					mgrParams.redEnvelopInChatRoomFromMe = isGroupSender();
+					mgrParams.redEnvelopInChatRoomFromOther = isGroupChat();
 
-				[[WBRedEnvelopParamQueue sharedQueue] enqueue:mgrParams];
+					[[WBRedEnvelopParamQueue sharedQueue] enqueue:mgrParams];
+			};
+
+			if (shouldReceiveRedEnvelop()) {
+				NSString *nativeUrl = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl];			
+				NSDictionary *nativeUrlDict = parseNativeUrl(nativeUrl);
+
+				queryRedEnvelopesReqeust(nativeUrlDict);
+				enqueueParam(nativeUrlDict);
 			}
 		}	
 		break;

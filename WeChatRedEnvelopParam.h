@@ -12,7 +12,6 @@
 
 - (NSDictionary *)toParams;
 
-@property (assign, nonatomic) BOOL redEnvelopSwitchOn;
 @property (assign, nonatomic) BOOL redEnvelopInChatRoomFromOther;
 @property (assign, nonatomic) BOOL redEnvelopInChatRoomFromMe;
 
@@ -23,6 +22,7 @@
 @property (strong, nonatomic) NSString *headImg;
 @property (strong, nonatomic) NSString *nativeUrl;
 @property (strong, nonatomic) NSString *sessionUserName;
+@property (strong, nonatomic) NSString *sign;
 @property (strong, nonatomic) NSString *timingIdentifier;
 
 @end
