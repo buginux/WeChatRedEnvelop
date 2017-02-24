@@ -12,9 +12,6 @@
 
 - (NSDictionary *)toParams;
 
-@property (assign, nonatomic) BOOL redEnvelopInChatRoomFromOther;
-@property (assign, nonatomic) BOOL redEnvelopInChatRoomFromMe;
-
 @property (strong, nonatomic) NSString *msgType;
 @property (strong, nonatomic) NSString *sendId;
 @property (strong, nonatomic) NSString *channelId;

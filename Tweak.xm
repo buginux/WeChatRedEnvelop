@@ -30,6 +30,9 @@
 
 	BOOL (^shouldReceiveRedEnvelop)() = ^BOOL() {
 
+		// 手动抢红包
+		if (!mgrParams) { return NO; }
+
 		// 自己已经抢过
 		if ([responseDict[@"receiveStatus"] integerValue] == 2) { return NO; }
 
@@ -42,7 +45,7 @@
 		// 不是同一个请求
 		if (![parseRequestSign() isEqualToString:mgrParams.sign]) { return NO; }
 
-		return ([WBRedEnvelopConfig sharedConfig].autoReceiveEnable && (mgrParams.redEnvelopInChatRoomFromOther || mgrParams.redEnvelopInChatRoomFromMe));
+		return [WBRedEnvelopConfig sharedConfig].autoReceiveEnable;
 	};
 
 	if (shouldReceiveRedEnvelop()) {
@@ -147,8 +150,6 @@
 					mgrParams.nativeUrl = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl];
 					mgrParams.sessionUserName = isGroupSender() ? wrap.m_nsToUsr : wrap.m_nsFromUsr;
 					mgrParams.sign = [nativeUrlDict stringForKey:@"sign"];
-					mgrParams.redEnvelopInChatRoomFromMe = isGroupSender();
-					mgrParams.redEnvelopInChatRoomFromOther = isGroupChat();
 
 					[[WBRedEnvelopParamQueue sharedQueue] enqueue:mgrParams];
 			};
