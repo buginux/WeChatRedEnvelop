@@ -103,6 +103,11 @@
 				return [wrap.m_nsFromUsr rangeOfString:@"@chatroom"].location != NSNotFound;
 			};
 
+			/** 是否在黑名单中 */
+			BOOL (^isGroupInBlackList)() = ^BOOL() {
+				return [[WBRedEnvelopConfig sharedConfig].blackList containsObject:wrap.m_nsFromUsr];
+			};
+
 			/** 是否自己在群聊中发消息 */
 			BOOL (^isGroupSender)() = ^BOOL() {
 				BOOL isSender = NO;
@@ -116,8 +121,8 @@
 			/** 是否自动抢红包 */
 			BOOL (^shouldReceiveRedEnvelop)() = ^BOOL() {
 				if (![WBRedEnvelopConfig sharedConfig].autoReceiveEnable) { return NO; }
-
-				return [WBRedEnvelopConfig sharedConfig].autoReceiveEnable && (isGroupChat() || isGroupSender());
+				if (isGroupInBlackList()) { return NO; }
+				return isGroupChat() || isGroupSender();
 			};
 
 			NSDictionary *(^parseNativeUrl)(NSString *nativeUrl) = ^(NSString *nativeUrl) {
