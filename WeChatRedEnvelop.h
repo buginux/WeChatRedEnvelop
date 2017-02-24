@@ -111,6 +111,7 @@
 @interface CContactMgr : NSObject
 
 - (id)getSelfContact;
+- (id)getContactByName:(id)arg1;
 
 @end
 

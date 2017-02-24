@@ -14,15 +14,11 @@ static NSString * const kAutoReceiveRedEnvelopKey = @"XGWeChatRedEnvelopSwitchKe
 static NSString * const kSerialReceiveKey = @"WBSerialReceiveKey";
 static NSString * const kBlackListKey = @"WBBlackListKey";
 
-@interface WBRedEnvelopConfig () {
-    NSArray *_blackList;
-}
+@interface WBRedEnvelopConfig ()
 
 @end
 
 @implementation WBRedEnvelopConfig
-
-@synthesize blackList = _blackList;
 
 + (instancetype)sharedConfig {
     static WBRedEnvelopConfig *config = nil;
@@ -64,29 +60,11 @@ static NSString * const kBlackListKey = @"WBBlackListKey";
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-- (NSArray<CContact *> *)blackList {
-    if (!_blackList) {
-        [NSArray arrayWithContentsOfFile:[self blackListFilePath]];
-    }
-    return _blackList;
-}
-
 - (void)setBlackList:(NSArray *)blackList {
     _blackList = blackList;
     
-    NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *blackListFilePath = [documentPath stringByAppendingPathComponent:@"blackList.plist"];
-    BOOL success = [blackList writeToFile:blackListFilePath atomically:YES];
-    if (!success) {
-        NSLog(@"vvvvvvvv --- Save blackList failed");
-    }
-//    [[NSUserDefaults standardUserDefaults] setObject:blackList forKey:kBlackListKey];
-//    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-- (NSString *)blackListFilePath {
-    NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    return [documentPath stringByAppendingString:@"blackList.plist"];
+    [[NSUserDefaults standardUserDefaults] setObject:blackList forKey:kBlackListKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 @end

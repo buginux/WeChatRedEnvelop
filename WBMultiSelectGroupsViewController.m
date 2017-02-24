@@ -36,8 +36,12 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    for (NSDictionary *select in self.blackList) {
-        [self.selectView addSelect:select];
+    MMServiceCenter *serviceCenter = [objc_getClass("MMServiceCenter") defaultCenter];
+    CContactMgr *contactMgr = [serviceCenter getService:objc_getClass("CContactMgr")];
+    
+    for (NSString *contactName in self.blackList) {
+        CContact *contact = [contactMgr getContactByName:contactName];
+        [self.selectView addSelect:contact];
     }
 }
 
