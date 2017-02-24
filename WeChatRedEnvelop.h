@@ -98,7 +98,7 @@
 
 #pragma mark - Contact
 
-@interface CContact: NSObject
+@interface CContact: NSObject <NSCoding>
 
 @property(retain, nonatomic) NSString *m_nsUsrName;
 @property(retain, nonatomic) NSString *m_nsHeadImgUrl;
@@ -168,6 +168,12 @@
 @end
 
 #pragma mark - UI
+@interface MMUICommonUtil : NSObject
+
++ (id)getBarButtonWithTitle:(id)arg1 target:(id)arg2 action:(SEL)arg3 style:(int)arg4;
+
+@end
+
 @interface MMLoadingView : UIView
 
 @property(retain, nonatomic) UILabel *m_label; // @synthesize m_label;
@@ -188,29 +194,23 @@
 
 @end
 
+
+@protocol ContactSelectViewDelegate <NSObject>
+
+- (void)onSelectContact:(CContact *)arg1;
+
+@end
+
 @interface ContactSelectView : UIView
+
+@property(nonatomic) unsigned int m_uiGroupScene; // @synthesize m_uiGroupScene;
+@property(nonatomic) _Bool m_bMultiSelect; // @synthesize m_bMultiSelect;
+@property(retain, nonatomic) NSMutableDictionary *m_dicMultiSelect; // @synthesize m_dicMultiSelect;
 
 - (id)initWithFrame:(struct CGRect)arg1 delegate:(id)arg2;
 - (void)initData:(unsigned int)arg1;
 - (void)initView;
-
-@end
-
-@protocol MultiSelectContactsViewControllerDelegate <NSObject>
-- (void)onMultiSelectContactReturn:(NSArray *)arg1;
-
-@optional
-- (int)getFTSCommonScene;
-- (void)onMultiSelectContactCancelForSns;
-- (void)onMultiSelectContactReturnForSns:(NSArray *)arg1;
-@end
-
-@interface MultiSelectContactsViewController : UIViewController
-
-@property(nonatomic) _Bool m_bKeepCurViewAfterSelect; // @synthesize m_bKeepCurViewAfterSelect=_m_bKeepCurViewAfterSelect;
-@property(nonatomic) unsigned int m_uiGroupScene; // @synthesize m_uiGroupScene;
-
-@property(nonatomic, weak) id <MultiSelectContactsViewControllerDelegate> m_delegate; // @synthesize m_delegate;
+- (void)addSelect:(id)arg1;
 
 @end
 
@@ -265,3 +265,22 @@
 - (void)reloadTableData;
 
 @end
+
+@protocol MultiSelectContactsViewControllerDelegate <NSObject>
+- (void)onMultiSelectContactReturn:(NSArray *)arg1;
+
+@optional
+- (int)getFTSCommonScene;
+- (void)onMultiSelectContactCancelForSns;
+- (void)onMultiSelectContactReturnForSns:(NSArray *)arg1;
+@end
+
+@interface MultiSelectContactsViewController : UIViewController
+
+@property(nonatomic) _Bool m_bKeepCurViewAfterSelect; // @synthesize m_bKeepCurViewAfterSelect=_m_bKeepCurViewAfterSelect;
+@property(nonatomic) unsigned int m_uiGroupScene; // @synthesize m_uiGroupScene;
+
+@property(nonatomic, weak) id <MultiSelectContactsViewControllerDelegate> m_delegate; // @synthesize m_delegate;
+
+@end
+

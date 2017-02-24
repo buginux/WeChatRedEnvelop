@@ -125,7 +125,14 @@
 }
 
 - (MMTableViewCellInfo *)createBlackListCell {
-    return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(showBlackList) target:self title:@"黑名单" accessoryType:1];
+
+    if ([WBRedEnvelopConfig sharedConfig].blackList.count == 0) {
+        return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(showBlackList) target:self title:@"这些群不抢" rightValue:@"已关闭" accessoryType:1];
+    } else {
+        NSString *blackListCountStr = [NSString stringWithFormat:@"已选 %lu 个群", (unsigned long)[WBRedEnvelopConfig sharedConfig].blackList.count];
+        return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(showBlackList) target:self title:@"这些群不抢" rightValue:blackListCountStr accessoryType:1];
+    }
+    
 }
 
 - (MMTableViewSectionInfo *)createComingSoonCell {
@@ -137,22 +144,12 @@
 }
 
 - (void)showBlackList {
-    MultiSelectContactsViewController *contactsViewController = [[objc_getClass("MultiSelectContactsViewController") alloc] init];
-    [contactsViewController performSelector:@selector(initView)];
-    contactsViewController.m_delegate = self;
-    contactsViewController.m_uiGroupScene = 2;
-    
-    Ivar ivar = class_getInstanceVariable(objc_getClass("MultiSelectContactsViewController"), "m_selectView");
-    id contactSelectView = object_getIvar(contactsViewController, ivar);
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:[NSString stringWithFormat:@"%s -- %@", __func__, contactSelectView] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-    [alert show];
-    
-//    WBMultiSelectGroupsViewController *contactsViewController = [[WBMultiSelectGroupsViewController alloc] init];
-//    contactsViewController.delegate = self;
+    WBMultiSelectGroupsViewController *contactsViewController = [[WBMultiSelectGroupsViewController alloc] initWithBlackList:[WBRedEnvelopConfig sharedConfig].blackList];
+    contactsViewController.delegate = self;
 
-//    MMUINavigationController *navigationController = [[objc_getClass("MMUINavigationController") alloc] initWithRootViewController:contactsViewController];
+    MMUINavigationController *navigationController = [[objc_getClass("MMUINavigationController") alloc] initWithRootViewController:contactsViewController];
     
-//    [self presentViewController:navigationController animated:YES completion:nil];
+    [self presentViewController:navigationController animated:YES completion:nil];
 }
 
 #pragma mark - About
@@ -224,6 +221,7 @@
     NSString *message = [NSString stringWithFormat:@"%s -- %@", __func__, arg1];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
     [alert show];
+    NSLog(@"vvvvvvvv -- %@", message);
 }
 
 - (void)onMultiSelectContactCancelForSns {
@@ -236,6 +234,21 @@
     NSString *message = [NSString stringWithFormat:@"%s -- %@", __func__, arg1];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
     [alert show];
+    NSLog(@"vvvvvvvv -- %@", message);
+    
 }
+
+#pragma mark - MultiSelectGroupsViewControllerDelegate
+- (void)onMultiSelectGroupCancel {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+- (void)onMultiSelectGroupReturn:(NSArray *)arg1 {
+    [WBRedEnvelopConfig sharedConfig].blackList = arg1;
+    
+    [self reloadTableData];
+    
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 
 @end
