@@ -146,7 +146,7 @@
 }
 
 - (MMTableViewCellInfo *)createBlackListCell {
-
+    
     if ([WBRedEnvelopConfig sharedConfig].blackList.count == 0) {
         return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(showBlackList) target:self title:@"群聊过滤" rightValue:@"已关闭" accessoryType:1];
     } else {
@@ -163,7 +163,7 @@
 - (MMTableViewSectionInfo *)createAbortRemokeMessageCell {
     return [objc_getClass("MMTableViewCellInfo") normalCellForTitle:@"消息防撤回" rightValue:@"开发中..."];
 }
-            
+
 - (void)settingReceiveByQueue:(UISwitch *)queueSwitch {
     [WBRedEnvelopConfig sharedConfig].serialReceive = queueSwitch.on;
 }
@@ -171,7 +171,7 @@
 - (void)showBlackList {
     WBMultiSelectGroupsViewController *contactsViewController = [[WBMultiSelectGroupsViewController alloc] initWithBlackList:[WBRedEnvelopConfig sharedConfig].blackList];
     contactsViewController.delegate = self;
-
+    
     MMUINavigationController *navigationController = [[objc_getClass("MMUINavigationController") alloc] initWithRootViewController:contactsViewController];
     
     [self presentViewController:navigationController animated:YES completion:nil];
