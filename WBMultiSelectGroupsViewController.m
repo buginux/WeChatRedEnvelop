@@ -49,6 +49,10 @@
     self.navigationItem.leftBarButtonItem = [objc_getClass("MMUICommonUtil") getBarButtonWithTitle:@"取消" target:self action:@selector(onCancel:) style:0];
     
     self.navigationItem.rightBarButtonItem = [self rightBarButtonWithSelectCount:self.blackList.count];
+    
+    self.title = @"黑名单";
+    
+    [self.navigationController.navigationBar setTitleTextAttributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0]}];
 }
 
 - (UIBarButtonItem *)rightBarButtonWithSelectCount:(unsigned long)selectCount {

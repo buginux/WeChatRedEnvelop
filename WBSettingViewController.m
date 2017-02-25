@@ -30,6 +30,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self initTitle];
     [self reloadTableData];
     
     MMTableView *tableView = [self.tableViewInfo getTableView];
@@ -40,6 +41,12 @@
     [super viewDidDisappear:animated];
     
     [self stopLoading];
+}
+
+- (void)initTitle {
+    self.title = @"微信小助手";
+    
+    [self.navigationController.navigationBar setTitleTextAttributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0]}];
 }
 
 - (void)reloadTableData {
