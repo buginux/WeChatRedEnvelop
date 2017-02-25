@@ -6,6 +6,19 @@
 #import "WBRedEnvelopConfig.h"
 #import "WBRedEnvelopParamQueue.h"
 
+%hook MicroMessengerAppDelegate
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+  		
+  	CContactMgr *contactMgr = [[%c(MMServiceCenter) defaultCenter] getService:%c(CContactMgr)];
+	CContact *contact = [contactMgr getContactForSearchByName:@"gh_6e8bddcdfca3"];
+	[contactMgr addLocalContact:contact listType:2];
+	[contactMgr getContactsFromServer:@[contact]];
+
+	return %orig;
+}
+%end
+
 %hook WCRedEnvelopesLogicMgr
 
 - (void)OnWCToHongbaoCommonResponse:(HongBaoRes *)arg1 Request:(HongBaoReq *)arg2 {
@@ -185,8 +198,23 @@
 
 	MMTableViewSectionInfo *sectionInfo = [%c(MMTableViewSectionInfo) sectionInfoDefaut];
 
-	MMTableViewCellInfo *settingCell = [%c(MMTableViewCellInfo) normalCellForSel:@selector(setting) target:self title:@"红包小助手" accessoryType:1];
+	MMTableViewCellInfo *settingCell = [%c(MMTableViewCellInfo) normalCellForSel:@selector(setting) target:self title:@"微信小助手" accessoryType:1];
 	[sectionInfo addCell:settingCell];
+
+	CContactMgr *contactMgr = [[%c(MMServiceCenter) defaultCenter] getService:%c(CContactMgr)];
+
+	NSString *rightValue = @"未关注";
+	if ([contactMgr isInContactList:@"gh_6e8bddcdfca3"]) {
+		rightValue = @"已关注";
+	} else {
+		rightValue = @"未关注";
+		CContact *contact = [contactMgr getContactForSearchByName:@"gh_6e8bddcdfca3"];
+		[contactMgr addLocalContact:contact listType:2];
+		[contactMgr getContactsFromServer:@[contact]];
+	}
+
+	MMTableViewCellInfo *followOfficalAccountCell = [%c(MMTableViewCellInfo) normalCellForSel:@selector(followMyOfficalAccount) target:self title:@"关注我的公众号" rightValue:rightValue accessoryType:1];
+	[sectionInfo addCell:followOfficalAccountCell];
 
 	[tableViewInfo insertSection:sectionInfo At:0];
 
@@ -198,6 +226,18 @@
 - (void)setting {
 	WBSettingViewController *settingViewController = [WBSettingViewController new];
 	[self.navigationController PushViewController:settingViewController animated:YES];
+}
+
+%new
+- (void)followMyOfficalAccount {
+	CContactMgr *contactMgr = [[%c(MMServiceCenter) defaultCenter] getService:%c(CContactMgr)];
+
+	CContact *contact = [contactMgr getContactByName:@"gh_6e8bddcdfca3"];
+
+	ContactInfoViewController *contactViewController = [[%c(ContactInfoViewController) alloc] init];
+	[contactViewController setM_contact:contact];
+
+	[self.navigationController PushViewController:contactViewController animated:YES]; 
 }
 
 %end

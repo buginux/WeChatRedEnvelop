@@ -12,7 +12,7 @@
 #import <objc/objc-runtime.h>
 #import "WBMultiSelectGroupsViewController.h"
 
-@interface WBSettingViewController () <MultiSelectContactsViewControllerDelegate, MultiSelectGroupsViewControllerDelegate>
+@interface WBSettingViewController () <MultiSelectGroupsViewControllerDelegate>
 
 @property (nonatomic, strong) MMTableViewInfo *tableViewInfo;
 
@@ -46,7 +46,15 @@
     [self.tableViewInfo clearAllSection];
     
     [self addBasicSettingSection];
-    [self addAdvanceSettingSection];
+    
+    CContactMgr *contactMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:objc_getClass("CContactMgr")];
+    
+    if ([contactMgr isInContactList:@"gh_6e8bddcdfca3"]) {
+        [self addAdvanceSettingSection];
+    } else {
+        [self addAdvanceLimitSection];
+    }
+    
     [self addSupportSection];
     [self addAboutSection];
     
@@ -60,10 +68,7 @@
     MMTableViewSectionInfo *sectionInfo = [objc_getClass("MMTableViewSectionInfo") sectionInfoDefaut];
     
     [sectionInfo addCell:[self createAutoReceiveRedEnvelopCell]];
-    
-    if ([WBRedEnvelopConfig sharedConfig].autoReceiveEnable) {
-        [sectionInfo addCell:[self createDelaySettingCell]];
-    }
+    [sectionInfo addCell:[self createDelaySettingCell]];
     
     [self.tableViewInfo addSection:sectionInfo];
 }
@@ -75,7 +80,15 @@
 
 - (MMTableViewCellInfo *)createDelaySettingCell {
     NSInteger delaySeconds = [WBRedEnvelopConfig sharedConfig].delaySeconds;
-    return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(settingDelay) target:self title:@"延迟抢红包" rightValue:[NSString stringWithFormat:@"%ld 秒", (long)delaySeconds] accessoryType:1];
+    NSString *delayString = delaySeconds == 0 ? @"不延迟" : [NSString stringWithFormat:@"%ld 秒", (long)delaySeconds];
+    
+    MMTableViewCellInfo *cellInfo;
+    if ([WBRedEnvelopConfig sharedConfig].autoReceiveEnable) {
+        cellInfo = [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(settingDelay) target:self title:@"延迟抢红包" rightValue: delayString accessoryType:1];
+    } else {
+        cellInfo = [objc_getClass("MMTableViewCellInfo") normalCellForTitle:@"延迟抢红包" rightValue: @"抢红包已关闭"];
+    }
+    return cellInfo;
 }
 
 - (void)switchRedEnvelop:(UISwitch *)envelopSwitch {
@@ -115,7 +128,8 @@
     
     [sectionInfo addCell:[self createQueueCell]];
     [sectionInfo addCell:[self createBlackListCell]];
-    [sectionInfo addCell:[self createComingSoonCell]];
+    [sectionInfo addCell:[self createKeywordFilterCell]];
+    [sectionInfo addCell:[self createAbortRemokeMessageCell]];
     
     [self.tableViewInfo addSection:sectionInfo];
 }
@@ -127,16 +141,20 @@
 - (MMTableViewCellInfo *)createBlackListCell {
 
     if ([WBRedEnvelopConfig sharedConfig].blackList.count == 0) {
-        return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(showBlackList) target:self title:@"这些群不抢" rightValue:@"已关闭" accessoryType:1];
+        return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(showBlackList) target:self title:@"群聊过滤" rightValue:@"已关闭" accessoryType:1];
     } else {
         NSString *blackListCountStr = [NSString stringWithFormat:@"已选 %lu 个群", (unsigned long)[WBRedEnvelopConfig sharedConfig].blackList.count];
-        return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(showBlackList) target:self title:@"这些群不抢" rightValue:blackListCountStr accessoryType:1];
+        return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(showBlackList) target:self title:@"群聊过滤" rightValue:blackListCountStr accessoryType:1];
     }
     
 }
 
-- (MMTableViewSectionInfo *)createComingSoonCell {
-    return [objc_getClass("MMTableViewCellInfo") normalCellForTitle:@"更多功能开发中" rightValue:@"敬请期待..."];
+- (MMTableViewSectionInfo *)createKeywordFilterCell {
+    return [objc_getClass("MMTableViewCellInfo") normalCellForTitle:@"关键词过滤" rightValue:@"开发中..."];
+}
+
+- (MMTableViewSectionInfo *)createAbortRemokeMessageCell {
+    return [objc_getClass("MMTableViewCellInfo") normalCellForTitle:@"消息防撤回" rightValue:@"开发中..."];
 }
             
 - (void)settingReceiveByQueue:(UISwitch *)queueSwitch {
@@ -150,6 +168,35 @@
     MMUINavigationController *navigationController = [[objc_getClass("MMUINavigationController") alloc] initWithRootViewController:contactsViewController];
     
     [self presentViewController:navigationController animated:YES completion:nil];
+}
+
+#pragma mark - ProLimit
+
+- (void)addAdvanceLimitSection {
+    MMTableViewSectionInfo *sectionInfo = [objc_getClass("MMTableViewSectionInfo") sectionInfoHeader:@"高级功能" Footer:@"关注公众号后开启高级功能"];
+    
+    [sectionInfo addCell:[self createQueueLimitCell]];
+    [sectionInfo addCell:[self createBlackListLimitCell]];
+    [sectionInfo addCell:[self createKeywordFilterLimitCell]];
+    [sectionInfo addCell:[self createAbortRemokeMessageLimitCell]];
+    
+    [self.tableViewInfo addSection:sectionInfo];
+}
+
+- (MMTableViewCellInfo *)createQueueLimitCell {
+    return [objc_getClass("MMTableViewCellInfo") normalCellForTitle:@"防止同时抢多个红包" rightValue:@"未启用"];
+}
+
+- (MMTableViewCellInfo *)createBlackListLimitCell {
+    return [objc_getClass("MMTableViewCellInfo") normalCellForTitle:@"群聊过滤" rightValue:@"未启用"];
+}
+
+- (MMTableViewSectionInfo *)createKeywordFilterLimitCell {
+    return [objc_getClass("MMTableViewCellInfo") normalCellForTitle:@"关键词过滤" rightValue:@"未启用"];
+}
+
+- (MMTableViewSectionInfo *)createAbortRemokeMessageLimitCell {
+    return [objc_getClass("MMTableViewCellInfo") normalCellForTitle:@"消息防撤回" rightValue:@"未启用"];
 }
 
 #pragma mark - About
@@ -213,29 +260,6 @@
     
     NewQRCodeScanner *qrCodeScanner = [[objc_getClass("NewQRCodeScanner") alloc] initWithDelegate:scanQRCodeLogic CodeType:3];
     [qrCodeScanner notifyResult:@"https://wx.tenpay.com/f2f?t=AQAAABxXiDaVyoYdR5F1zBNM5jI%3D" type:@"QR_CODE" version:6];
-}
-
-#pragma mark - MultiSelectContactsViewControllerDelegate
-
-- (void)onMultiSelectContactReturn:(NSArray *)arg1 {
-    NSString *message = [NSString stringWithFormat:@"%s -- %@", __func__, arg1];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-    [alert show];
-    NSLog(@"vvvvvvvv -- %@", message);
-}
-
-- (void)onMultiSelectContactCancelForSns {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:[NSString stringWithFormat:@"%s", __func__] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-    [alert show];
-    [self dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (void)onMultiSelectContactReturnForSns:(NSArray *)arg1 {
-    NSString *message = [NSString stringWithFormat:@"%s -- %@", __func__, arg1];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alert" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-    [alert show];
-    NSLog(@"vvvvvvvv -- %@", message);
-    
 }
 
 #pragma mark - MultiSelectGroupsViewControllerDelegate

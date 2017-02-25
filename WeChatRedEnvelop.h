@@ -112,6 +112,10 @@
 
 - (id)getSelfContact;
 - (id)getContactByName:(id)arg1;
+- (id)getContactForSearchByName:(id)arg1;
+- (_Bool)getContactsFromServer:(id)arg1;
+- (_Bool)isInContactList:(id)arg1;
+- (_Bool)addLocalContact:(id)arg1 listType:(unsigned int)arg2;
 
 @end
 
@@ -150,6 +154,7 @@
 
 + (id)sectionInfoDefaut;
 + (id)sectionInfoHeader:(id)arg1;
++ (id)sectionInfoHeader:(id)arg1 Footer:(id)arg2;
 - (void)addCell:(id)arg1;
 
 @end
@@ -261,9 +266,26 @@
 
 @end
 
-@interface NewSettingViewController: UINavigationController
+@interface MMUIViewController : UIViewController
+
+- (void)startLoadingBlocked;
+- (void)startLoadingNonBlock;
+- (void)startLoadingWithText:(NSString *)text;
+- (void)stopLoading;
+- (void)stopLoadingWithFailText:(NSString *)text;
+- (void)stopLoadingWithOKText:(NSString *)text;
+
+@end
+
+@interface NewSettingViewController: MMUIViewController
 
 - (void)reloadTableData;
+
+@end
+
+@interface ContactInfoViewController : MMUIViewController
+
+@property(retain, nonatomic) CContact *m_contact; // @synthesize m_contact;
 
 @end
 
