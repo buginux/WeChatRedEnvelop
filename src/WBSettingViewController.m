@@ -210,33 +210,22 @@
 - (void)addAboutSection {
     MMTableViewSectionInfo *sectionInfo = [objc_getClass("MMTableViewSectionInfo") sectionInfoDefaut];
     
-    [sectionInfo addCell:[self createIntroductionCell]];
     [sectionInfo addCell:[self createGithubCell]];
     [sectionInfo addCell:[self createBlogCell]];
     
     [self.tableViewInfo addSection:sectionInfo];
 }
 
-- (MMTableViewCellInfo *)createIntroductionCell {
-    return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(showIntroduction) target:self title:@"使用说明" accessoryType:1];
-}
-
 - (MMTableViewCellInfo *)createGithubCell {
-    return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(showGithub) target:self title:@"我的 Github" accessoryType:1];
+    return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(showGithub) target:self title:@"我的 Github" rightValue: @"★ star" accessoryType:1];
 }
 
 - (MMTableViewCellInfo *)createBlogCell {
     return [objc_getClass("MMTableViewCellInfo") normalCellForSel:@selector(showBlog) target:self title:@"我的博客" accessoryType:1];
 }
 
-- (void)showIntroduction {
-    NSURL *introductionUrl = [NSURL URLWithString:@"https://github.com/buginux/WeChatRedEnvelop/blob/RedEnvelopPro/Introduction/Introduction.md"];
-    MMWebViewController *webViewController = [[objc_getClass("MMWebViewController") alloc] initWithURL:introductionUrl presentModal:NO extraInfo:nil];
-    [self.navigationController PushViewController:webViewController animated:YES];
-}
-
 - (void)showGithub {
-    NSURL *gitHubUrl = [NSURL URLWithString:@"https://www.github.com/buginux"];
+    NSURL *gitHubUrl = [NSURL URLWithString:@"https://github.com/buginux/WeChatRedEnvelop"];
     MMWebViewController *webViewController = [[objc_getClass("MMWebViewController") alloc] initWithURL:gitHubUrl presentModal:NO extraInfo:nil];
     [self.navigationController PushViewController:webViewController animated:YES];
 }
