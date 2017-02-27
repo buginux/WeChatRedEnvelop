@@ -50,15 +50,16 @@
 		if ([responseDict[@"receiveStatus"] integerValue] == 2) { return NO; }
 
 		// 红包被抢完
-		if ([responseDict[@"hbStatus"] integerValue] == 4) { return NO; }
+		if ([responseDict[@"hbStatus"] integerValue] == 4) { return NO; }		
 
 		// 没有这个字段会被判定为使用外挂
-		if (!responseDict[@"timingIdentifier"]) { return NO; }
+		if (!responseDict[@"timingIdentifier"]) { return NO; }		
 
-		// 不是同一个请求
-		if (![parseRequestSign() isEqualToString:mgrParams.sign]) { return NO; }
-
-		return [WBRedEnvelopConfig sharedConfig].autoReceiveEnable;
+		if (mgrParams.isGroupSender) { // 自己发红包的时候没有 sign 字段
+			return [WBRedEnvelopConfig sharedConfig].autoReceiveEnable;
+		} else {
+			return [parseRequestSign() isEqualToString:mgrParams.sign] && [WBRedEnvelopConfig sharedConfig].autoReceiveEnable;
+		}
 	};
 
 	if (shouldReceiveRedEnvelop()) {
@@ -111,9 +112,23 @@
 			CContactMgr *contactManager = [[%c(MMServiceCenter) defaultCenter] getService:[%c(CContactMgr) class]];
 			CContact *selfContact = [contactManager getSelfContact];
 
-			/** 是否为群聊 */
-			BOOL (^isGroupChat)() = ^BOOL() {
+			BOOL (^isSender)() = ^BOOL() {
+				return [wrap.m_nsFromUsr isEqualToString:selfContact.m_nsUsrName];
+			};
+
+			/** 是否别人在群聊中发消息 */
+			BOOL (^isGroupReceiver)() = ^BOOL() {
 				return [wrap.m_nsFromUsr rangeOfString:@"@chatroom"].location != NSNotFound;
+			};
+
+			/** 是否自己在群聊中发消息 */
+			BOOL (^isGroupSender)() = ^BOOL() {
+				return isSender() && [wrap.m_nsToUsr rangeOfString:@"chatroom"].location != NSNotFound;
+			};
+
+			/** 是否抢自己发的红包 */
+			BOOL (^isReceiveSelfRedEnvelop)() = ^BOOL() {
+				return [WBRedEnvelopConfig sharedConfig].receiveSelfRedEnvelop;
 			};
 
 			/** 是否在黑名单中 */
@@ -121,21 +136,12 @@
 				return [[WBRedEnvelopConfig sharedConfig].blackList containsObject:wrap.m_nsFromUsr];
 			};
 
-			/** 是否自己在群聊中发消息 */
-			BOOL (^isGroupSender)() = ^BOOL() {
-				BOOL isSender = NO;
-				if ([wrap.m_nsFromUsr isEqualToString:selfContact.m_nsUsrName]) {
-					isSender = YES;
-				}
-
-				return isSender && isGroupChat();
-			};
-
 			/** 是否自动抢红包 */
 			BOOL (^shouldReceiveRedEnvelop)() = ^BOOL() {
 				if (![WBRedEnvelopConfig sharedConfig].autoReceiveEnable) { return NO; }
 				if (isGroupInBlackList()) { return NO; }
-				return isGroupChat() || isGroupSender();
+
+				return isGroupReceiver() || (isGroupSender() && isReceiveSelfRedEnvelop());
 			};
 
 			NSDictionary *(^parseNativeUrl)(NSString *nativeUrl) = ^(NSString *nativeUrl) {
@@ -168,6 +174,8 @@
 					mgrParams.nativeUrl = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl];
 					mgrParams.sessionUserName = isGroupSender() ? wrap.m_nsToUsr : wrap.m_nsFromUsr;
 					mgrParams.sign = [nativeUrlDict stringForKey:@"sign"];
+
+					mgrParams.isGroupSender = isGroupSender();
 
 					[[WBRedEnvelopParamQueue sharedQueue] enqueue:mgrParams];
 			};

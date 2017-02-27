@@ -17,6 +17,7 @@
 @property (assign, nonatomic) NSInteger delaySeconds;
 
 /** Pro */
+@property (assign, nonatomic) BOOL receiveSelfRedEnvelop;
 @property (assign, nonatomic) BOOL serialReceive;
 @property (strong, nonatomic) NSArray *blackList;
 

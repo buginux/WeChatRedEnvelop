@@ -133,12 +133,17 @@
 - (void)addAdvanceSettingSection {
     MMTableViewSectionInfo *sectionInfo = [objc_getClass("MMTableViewSectionInfo") sectionInfoHeader:@"高级功能"];
     
+    [sectionInfo addCell:[self createReceiveSelfRedEnvelopCell]];
     [sectionInfo addCell:[self createQueueCell]];
     [sectionInfo addCell:[self createBlackListCell]];
     [sectionInfo addCell:[self createKeywordFilterCell]];
     [sectionInfo addCell:[self createAbortRemokeMessageCell]];
     
     [self.tableViewInfo addSection:sectionInfo];
+}
+
+- (MMTableViewCellInfo *)createReceiveSelfRedEnvelopCell {
+    return [objc_getClass("MMTableViewCellInfo") switchCellForSel:@selector(settingReceiveSelfRedEnvelop:) target:self title:@"抢自己发的红包" on:[WBRedEnvelopConfig sharedConfig].receiveSelfRedEnvelop];
 }
 
 - (MMTableViewCellInfo *)createQueueCell {
@@ -164,6 +169,10 @@
     return [objc_getClass("MMTableViewCellInfo") normalCellForTitle:@"消息防撤回" rightValue:@"开发中..."];
 }
 
+- (void)settingReceiveSelfRedEnvelop:(UISwitch *)receiveSwitch {
+    [WBRedEnvelopConfig sharedConfig].receiveSelfRedEnvelop = receiveSwitch.on;
+}
+
 - (void)settingReceiveByQueue:(UISwitch *)queueSwitch {
     [WBRedEnvelopConfig sharedConfig].serialReceive = queueSwitch.on;
 }
@@ -182,12 +191,17 @@
 - (void)addAdvanceLimitSection {
     MMTableViewSectionInfo *sectionInfo = [objc_getClass("MMTableViewSectionInfo") sectionInfoHeader:@"高级功能" Footer:@"关注公众号后开启高级功能"];
     
+    [sectionInfo addCell:[self createReceiveSelfRedEnvelopLimitCell]];
     [sectionInfo addCell:[self createQueueLimitCell]];
     [sectionInfo addCell:[self createBlackListLimitCell]];
     [sectionInfo addCell:[self createKeywordFilterLimitCell]];
     [sectionInfo addCell:[self createAbortRemokeMessageLimitCell]];
     
     [self.tableViewInfo addSection:sectionInfo];
+}
+
+- (MMTableViewCellInfo *)createReceiveSelfRedEnvelopLimitCell {
+    return [objc_getClass("MMTableViewCellInfo") normalCellForTitle:@"抢自己发的红包" rightValue:@"未启用"];
 }
 
 - (MMTableViewCellInfo *)createQueueLimitCell {

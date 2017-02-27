@@ -22,4 +22,6 @@
 @property (strong, nonatomic) NSString *sign;
 @property (strong, nonatomic) NSString *timingIdentifier;
 
+@property (assign, nonatomic) BOOL isGroupSender;
+
 @end
