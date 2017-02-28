@@ -20,6 +20,12 @@
 
 @end
 
+@interface CMessageMgr : NSObject
+
+- (void)AddLocalMsg:(id)arg1 MsgWrap:(id)arg2 fixTime:(_Bool)arg3 NewMsgArriveNotify:(_Bool)arg4;
+
+@end
+
 @interface CMessageWrap : NSObject
 
 @property (retain, nonatomic) WCPayInfoItem *m_oWCPayInfoItem;
@@ -47,6 +53,9 @@
 @property (retain, nonatomic) NSData *m_dtThumbnail;
 @property (retain, nonatomic) NSString *m_nsTitle;
 @property (retain, nonatomic) NSString *m_nsMsgSource;
+
+- (id)initWithMsgType:(long long)arg1;
++ (_Bool)isSenderFromMsgWrap:(id)arg1;
 
 @end
 
