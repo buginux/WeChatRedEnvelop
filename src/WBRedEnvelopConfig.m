@@ -38,6 +38,7 @@ static NSString * const kRevokeEnablekey = @"WBRevokeEnable";
         _serialReceive = [[NSUserDefaults standardUserDefaults] boolForKey:kSerialReceiveKey];
         _blackList = [[NSUserDefaults standardUserDefaults] objectForKey:kBlackListKey];
         _receiveSelfRedEnvelop = [[NSUserDefaults standardUserDefaults] boolForKey:kReceiveSelfRedEnvelopKey];
+        _revokeEnable = [[NSUserDefaults standardUserDefaults] boolForKey:kRevokeEnablekey];
     }
     return self;
 }
