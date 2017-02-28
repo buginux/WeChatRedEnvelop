@@ -20,5 +20,6 @@
 @property (assign, nonatomic) BOOL receiveSelfRedEnvelop;
 @property (assign, nonatomic) BOOL serialReceive;
 @property (strong, nonatomic) NSArray *blackList;
+@property (assign, nonatomic) BOOL revokeEnable;
 
 @end

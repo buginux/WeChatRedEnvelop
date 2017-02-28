@@ -14,6 +14,7 @@ static NSString * const kAutoReceiveRedEnvelopKey = @"XGWeChatRedEnvelopSwitchKe
 static NSString * const kReceiveSelfRedEnvelopKey = @"WBReceiveSelfRedEnvelopKey";
 static NSString * const kSerialReceiveKey = @"WBSerialReceiveKey";
 static NSString * const kBlackListKey = @"WBBlackListKey";
+static NSString * const kRevokeEnablekey = @"WBRevokeEnable";
 
 @interface WBRedEnvelopConfig ()
 
@@ -73,6 +74,13 @@ static NSString * const kBlackListKey = @"WBBlackListKey";
     _blackList = blackList;
     
     [[NSUserDefaults standardUserDefaults] setObject:blackList forKey:kBlackListKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)setRevokeEnable:(BOOL)revokeEnable {
+    _revokeEnable = revokeEnable;
+    
+    [[NSUserDefaults standardUserDefaults] setBool:revokeEnable forKey:kRevokeEnablekey];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

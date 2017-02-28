@@ -136,8 +136,8 @@
     [sectionInfo addCell:[self createReceiveSelfRedEnvelopCell]];
     [sectionInfo addCell:[self createQueueCell]];
     [sectionInfo addCell:[self createBlackListCell]];
-    [sectionInfo addCell:[self createKeywordFilterCell]];
     [sectionInfo addCell:[self createAbortRemokeMessageCell]];
+    [sectionInfo addCell:[self createKeywordFilterCell]];
     
     [self.tableViewInfo addSection:sectionInfo];
 }
@@ -161,12 +161,12 @@
     
 }
 
-- (MMTableViewSectionInfo *)createKeywordFilterCell {
-    return [objc_getClass("MMTableViewCellInfo") normalCellForTitle:@"关键词过滤" rightValue:@"开发中..."];
+- (MMTableViewSectionInfo *)createAbortRemokeMessageCell {
+    return [objc_getClass("MMTableViewCellInfo") switchCellForSel:@selector(settingMessageRevoke:) target:self title:@"消息防撤回" on:[WBRedEnvelopConfig sharedConfig].revokeEnable];
 }
 
-- (MMTableViewSectionInfo *)createAbortRemokeMessageCell {
-    return [objc_getClass("MMTableViewCellInfo") normalCellForTitle:@"消息防撤回" rightValue:@"开发中..."];
+- (MMTableViewSectionInfo *)createKeywordFilterCell {
+    return [objc_getClass("MMTableViewCellInfo") normalCellForTitle:@"关键词过滤" rightValue:@"开发中..."];
 }
 
 - (void)settingReceiveSelfRedEnvelop:(UISwitch *)receiveSwitch {
@@ -186,6 +186,10 @@
     [self presentViewController:navigationController animated:YES completion:nil];
 }
 
+- (void)settingMessageRevoke:(UISwitch *)revokeSwitch {
+    [WBRedEnvelopConfig sharedConfig].revokeEnable = revokeSwitch.on;
+}
+
 #pragma mark - ProLimit
 
 - (void)addAdvanceLimitSection {
@@ -194,8 +198,8 @@
     [sectionInfo addCell:[self createReceiveSelfRedEnvelopLimitCell]];
     [sectionInfo addCell:[self createQueueLimitCell]];
     [sectionInfo addCell:[self createBlackListLimitCell]];
-    [sectionInfo addCell:[self createKeywordFilterLimitCell]];
     [sectionInfo addCell:[self createAbortRemokeMessageLimitCell]];
+    [sectionInfo addCell:[self createKeywordFilterLimitCell]];
     
     [self.tableViewInfo addSection:sectionInfo];
 }
