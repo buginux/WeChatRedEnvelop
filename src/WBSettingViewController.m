@@ -53,6 +53,7 @@
     [self.tableViewInfo clearAllSection];
     
     [self addBasicSettingSection];
+    [self addSupportSection];
     
     CContactMgr *contactMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:objc_getClass("CContactMgr")];
     
@@ -62,7 +63,6 @@
         [self addAdvanceLimitSection];
     }
     
-    [self addSupportSection];
     [self addAboutSection];
     
     MMTableView *tableView = [self.tableViewInfo getTableView];
