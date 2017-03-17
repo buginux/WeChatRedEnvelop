@@ -135,13 +135,16 @@
 			BOOL (^isGroupInBlackList)() = ^BOOL() {
 				return [[WBRedEnvelopConfig sharedConfig].blackList containsObject:wrap.m_nsFromUsr];
 			};
-
+            /** 是否领取私聊红包 */
+            BOOL (^isReceivePrivateRedEnvelop)() = ^BOOL() {
+                return [WBRedEnvelopConfig sharedConfig].autoReceivePrivateEnable;
+            };
 			/** 是否自动抢红包 */
 			BOOL (^shouldReceiveRedEnvelop)() = ^BOOL() {
 				if (![WBRedEnvelopConfig sharedConfig].autoReceiveEnable) { return NO; }
 				if (isGroupInBlackList()) { return NO; }
 
-				return isGroupReceiver() || (isGroupSender() && isReceiveSelfRedEnvelop());
+				return isGroupReceiver() || (isGroupSender() && isReceiveSelfRedEnvelop()) || (isReceivePrivateRedEnvelop() && !isSender() && !isGroupReceiver());
 			};
 
 			NSDictionary *(^parseNativeUrl)(NSString *nativeUrl) = ^(NSString *nativeUrl) {

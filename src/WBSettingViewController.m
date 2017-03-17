@@ -75,6 +75,7 @@
     MMTableViewSectionInfo *sectionInfo = [objc_getClass("MMTableViewSectionInfo") sectionInfoDefaut];
     
     [sectionInfo addCell:[self createAutoReceiveRedEnvelopCell]];
+    [sectionInfo addCell:[self createAutoReceivePrivateRedEnvelopCell]];
     [sectionInfo addCell:[self createDelaySettingCell]];
     
     [self.tableViewInfo addSection:sectionInfo];
@@ -83,6 +84,10 @@
 
 - (MMTableViewCellInfo *)createAutoReceiveRedEnvelopCell {
     return [objc_getClass("MMTableViewCellInfo") switchCellForSel:@selector(switchRedEnvelop:) target:self title:@"自动抢红包" on:[WBRedEnvelopConfig sharedConfig].autoReceiveEnable];
+}
+
+- (MMTableViewCellInfo *)createAutoReceivePrivateRedEnvelopCell {
+    return [objc_getClass("MMTableViewCellInfo") switchCellForSel:@selector(switchPrivateRedEnvelop:) target:self title:@"自动领取私聊红包" on:[WBRedEnvelopConfig sharedConfig].autoReceivePrivateEnable];
 }
 
 - (MMTableViewCellInfo *)createDelaySettingCell {
@@ -96,6 +101,12 @@
         cellInfo = [objc_getClass("MMTableViewCellInfo") normalCellForTitle:@"延迟抢红包" rightValue: @"抢红包已关闭"];
     }
     return cellInfo;
+}
+
+- (void)switchPrivateRedEnvelop:(UISwitch *)privateRedEnvelop {
+    [WBRedEnvelopConfig sharedConfig].autoReceivePrivateEnable = privateRedEnvelop.on;
+    
+    [self reloadTableData];
 }
 
 - (void)switchRedEnvelop:(UISwitch *)envelopSwitch {
