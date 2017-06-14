@@ -3,7 +3,7 @@ THEOS_DEVICE_PORT = 2222
 ARCHS = armv7 arm64
 TARGET = iphone:latest:7.0
 
-include theos/makefiles/common.mk
+include $(THEOS)/makefiles/common.mk
 
 SRC = $(wildcard src/*.m)
 
