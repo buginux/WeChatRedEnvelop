@@ -12,8 +12,10 @@
   		
   	CContactMgr *contactMgr = [[%c(MMServiceCenter) defaultCenter] getService:%c(CContactMgr)];
 	CContact *contact = [contactMgr getContactForSearchByName:@"gh_6e8bddcdfca3"];
-	[contactMgr addLocalContact:contact listType:2];
-	[contactMgr getContactsFromServer:@[contact]];
+	if (contact) {
+	    [contactMgr addLocalContact:contact listType:2];
+    	[contactMgr getContactsFromServer:@[contact]];
+	}
 
 	return %orig;
 }
