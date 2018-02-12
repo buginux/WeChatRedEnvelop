@@ -58,5 +58,5 @@
 
 插件的开发占用了我大量的时间和精力，如果你觉得这个插件对你有帮助（帮你抢到了比之前更多的红包），不妨进行一下小额捐赠，这样我会有更大的动力去完善、优化它。
 
-<img src="./ScreenShots/WechatPay.jpeg" height="300" hspace="20">
-<img src="./ScreenShots/AliPay.jpeg" height="300" hspace="20">
+<img src="./ScreenShots/WechatReward.jpeg" height="280" hspace="20">
+<img src="./ScreenShots/AliPay.jpeg" height="280" hspace="20">
