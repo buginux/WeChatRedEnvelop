@@ -68,7 +68,7 @@
 
 @interface MMLanguageMgr: NSObject
 
-- (id)getStringForCurLanguage:(id)arg1 defaultTo:(id)arg2;
+- (id)getStringForCurLanguage:(id)arg1;
 
 
 @end
@@ -144,7 +144,7 @@
 @interface NewQRCodeScanner: NSObject
 
 - (id)initWithDelegate:(id)arg1 CodeType:(int)arg2;
-- (void)notifyResult:(id)arg1 type:(id)arg2 version:(int)arg3;
+- (void)notifyResult:(id)arg1 type:(id)arg2 version:(int)arg3 rawData:(NSData *)arg4;
 
 @end
 

@@ -53,7 +53,7 @@
     
     MMServiceCenter *serviceCenter = [objc_getClass("MMServiceCenter") defaultCenter];
     MMLanguageMgr *languageMgr = [serviceCenter getService:objc_getClass("MMLanguageMgr")];
-    NSString *loadingText = [languageMgr getStringForCurLanguage:@"Common_DefaultLoadingText" defaultTo:@"Common_DefaultLoadingText"];
+    NSString *loadingText = [languageMgr getStringForCurLanguage:@"Common_DefaultLoadingText"];
     
     [loadingView.m_label setText:loadingText];
     

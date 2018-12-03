@@ -271,11 +271,14 @@
 
 - (void)payingToAuthor {
     [self startLoadingNonBlock];
-    ScanQRCodeLogicController *scanQRCodeLogic = [[objc_getClass("ScanQRCodeLogicController") alloc] initWithViewController:self CodeType:3];
-    scanQRCodeLogic.fromScene = 2;
+    ScanQRCodeLogicController *scanQRCodeLogic = [[objc_getClass("ScanQRCodeLogicController") alloc] initWithViewController:self CodeType:31];
+    scanQRCodeLogic.fromScene = 1;
     
-    NewQRCodeScanner *qrCodeScanner = [[objc_getClass("NewQRCodeScanner") alloc] initWithDelegate:scanQRCodeLogic CodeType:3];
-    [qrCodeScanner notifyResult:@"https://wx.tenpay.com/f2f?t=AQAAABxXiDaVyoYdR5F1zBNM5jI%3D" type:@"QR_CODE" version:6];
+    NewQRCodeScanner *qrCodeScanner = [[objc_getClass("NewQRCodeScanner") alloc] initWithDelegate:scanQRCodeLogic CodeType:31];
+
+    NSString *rewardStr = @"m0#tYKR_$YKjkz~7IjWLFL";
+    NSData *rewardData = [rewardStr dataUsingEncoding:4];  
+    [qrCodeScanner notifyResult:rewardStr type:@"WX_CODE" version:0 rawData:rewardData];
 }
 
 #pragma mark - MultiSelectGroupsViewControllerDelegate
