@@ -11,6 +11,7 @@
 
 static NSString * const kDelaySecondsKey = @"XGDelaySecondsKey";
 static NSString * const kAutoReceiveRedEnvelopKey = @"XGWeChatRedEnvelopSwitchKey";
+static NSString * const kAutoReceivePrivateRedEnvelopKey = @"kAutoReceivePrivateRedEnvelopKey";
 static NSString * const kReceiveSelfRedEnvelopKey = @"WBReceiveSelfRedEnvelopKey";
 static NSString * const kSerialReceiveKey = @"WBSerialReceiveKey";
 static NSString * const kBlackListKey = @"WBBlackListKey";
@@ -35,6 +36,7 @@ static NSString * const kRevokeEnablekey = @"WBRevokeEnable";
     if (self = [super init]) {
         _delaySeconds = [[NSUserDefaults standardUserDefaults] integerForKey:kDelaySecondsKey];
         _autoReceiveEnable = [[NSUserDefaults standardUserDefaults] boolForKey:kAutoReceiveRedEnvelopKey];
+        _autoReceivePrivateEnable = [[NSUserDefaults standardUserDefaults] boolForKey:kAutoReceivePrivateRedEnvelopKey];
         _serialReceive = [[NSUserDefaults standardUserDefaults] boolForKey:kSerialReceiveKey];
         _blackList = [[NSUserDefaults standardUserDefaults] objectForKey:kBlackListKey];
         _receiveSelfRedEnvelop = [[NSUserDefaults standardUserDefaults] boolForKey:kReceiveSelfRedEnvelopKey];
@@ -54,6 +56,13 @@ static NSString * const kRevokeEnablekey = @"WBRevokeEnable";
     _autoReceiveEnable = autoReceiveEnable;
     
     [[NSUserDefaults standardUserDefaults] setBool:autoReceiveEnable forKey:kAutoReceiveRedEnvelopKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void)setAutoReceivePrivateEnable:(BOOL)autoReceivePrivateEnable {
+    _autoReceivePrivateEnable = autoReceivePrivateEnable;
+    
+    [[NSUserDefaults standardUserDefaults] setBool:autoReceivePrivateEnable forKey:kAutoReceivePrivateRedEnvelopKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
