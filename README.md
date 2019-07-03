@@ -49,8 +49,8 @@
 
 ## 应用截图
 
-<img src="./ScreenShots/Setting.jpeg" height="568" hspace="20">
-<img src="./ScreenShots/AssistantSetting.jpeg" height="568" hspace="20">
+<img src="./ScreenShots/Setting.jpg" height="568" hspace="20">
+<img src="./ScreenShots/AssistantSetting.jpg" height="568" hspace="20">
 
 ## 支持作者
 
@@ -60,3 +60,8 @@
 
 <img src="./ScreenShots/WechatReward.jpeg" height="280" hspace="20">
 <img src="./ScreenShots/AliPay.jpeg" height="280" hspace="20">
+
+**现已支持信用卡赞赏！**
+
+<img src="./ScreenShots/WechatPayCredit.jpg" height="280" hspace="20">
+
