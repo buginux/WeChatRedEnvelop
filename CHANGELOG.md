@@ -1,5 +1,9 @@
 # 更新日志
 
+**[v.2.1.0 (2019.07.02)
+
+- 更新支持 7.x 版本微信
+
 **[v.2.0.0 (2017.02.26)](https://github.com/buginux/WeChatRedEnvelop/releases/tag/2.0.0)**
 
 - 重构 代码更清晰易读，文件组织更规范
