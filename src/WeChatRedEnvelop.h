@@ -150,16 +150,16 @@
 
 #pragma mark - MMTableView
 
-@interface MMTableViewInfo
+@interface WCTableViewManager
 
-- (id)getTableView;
 - (void)clearAllSection;
-- (void)addSection:(id)arg1;
+- (id)getTableView;
 - (void)insertSection:(id)arg1 At:(unsigned int)arg2;
+- (void)addSection:(id)arg1;
 
-@end
+@end    
 
-@interface MMTableViewSectionInfo
+@interface WCTableViewSectionManager
 
 + (id)sectionInfoDefaut;
 + (id)sectionInfoHeader:(id)arg1;
@@ -168,13 +168,18 @@
 
 @end
 
-@interface MMTableViewCellInfo
+@interface WCTableViewCellManager
 
-+ (id)normalCellForSel:(SEL)arg1 target:(id)arg2 title:(id)arg3 accessoryType:(long long)arg4;
++ (id)normalCellForSel:(SEL)arg1 target:(id)arg2 title:(id)arg3;
++ (id)normalCellForSel:(SEL)arg1 target:(id)arg2 title:(id)arg3 rightValue:(id)arg4 WithDisclosureIndicator:(_Bool)arg5;
+
 + (id)switchCellForSel:(SEL)arg1 target:(id)arg2 title:(id)arg3 on:(_Bool)arg4;
-+ (id)normalCellForSel:(SEL)arg1 target:(id)arg2 title:(id)arg3 rightValue:(id)arg4 accessoryType:(long long)arg5;
+
+@end
+
+@interface WCTableViewNormalCellManager
+
 + (id)normalCellForTitle:(id)arg1 rightValue:(id)arg2;
-+ (id)urlCellForTitle:(id)arg1 url:(id)arg2;
 
 @end
 

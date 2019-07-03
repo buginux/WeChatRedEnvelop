@@ -253,11 +253,11 @@
 - (void)reloadTableData {
 	%orig;
 
-	MMTableViewInfo *tableViewInfo = MSHookIvar<id>(self, "m_tableViewInfo");
+	WCTableViewManager *tableViewMgr = MSHookIvar<id>(self, "m_tableViewMgr");
 
-	MMTableViewSectionInfo *sectionInfo = [%c(MMTableViewSectionInfo) sectionInfoDefaut];
+	WCTableViewSectionManager *sectionInfo = [%c(WCTableViewSectionManager) sectionInfoDefaut];
 
-	MMTableViewCellInfo *settingCell = [%c(MMTableViewCellInfo) normalCellForSel:@selector(setting) target:self title:@"微信小助手" accessoryType:1];
+	WCTableViewCellManager *settingCell = [%c(WCTableViewCellManager) normalCellForSel:@selector(setting) target:self title:@"微信小助手"];
 	[sectionInfo addCell:settingCell];
 
 	CContactMgr *contactMgr = [[%c(MMServiceCenter) defaultCenter] getService:%c(CContactMgr)];
@@ -272,12 +272,12 @@
 		[contactMgr getContactsFromServer:@[contact]];
 	}
 
-	MMTableViewCellInfo *followOfficalAccountCell = [%c(MMTableViewCellInfo) normalCellForSel:@selector(followMyOfficalAccount) target:self title:@"关注我的公众号" rightValue:rightValue accessoryType:1];
+	WCTableViewCellManager *followOfficalAccountCell = [%c(WCTableViewCellManager) normalCellForSel:@selector(followMyOfficalAccount) target:self title:@"关注我的公众号" rightValue:rightValue WithDisclosureIndicator:1];
 	[sectionInfo addCell:followOfficalAccountCell];
 
-	[tableViewInfo insertSection:sectionInfo At:0];
+	[tableViewMgr insertSection:sectionInfo At:0];
 
-	MMTableView *tableView = [tableViewInfo getTableView];
+	MMTableView *tableView = [tableViewMgr getTableView];
 	[tableView reloadData];
 }
 
