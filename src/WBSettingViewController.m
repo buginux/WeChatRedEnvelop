@@ -10,9 +10,8 @@
 #import "WeChatRedEnvelop.h"
 #import "WBRedEnvelopConfig.h"
 #import <objc/objc-runtime.h>
-#import "WBMultiSelectGroupsViewController.h"
 
-@interface WBSettingViewController () <MultiSelectGroupsViewControllerDelegate>
+@interface WBSettingViewController () <MultiSelectContactsViewControllerDelegate>
 
 @property (nonatomic, strong) WCTableViewManager *tableViewMgr;
 
@@ -47,8 +46,6 @@
 
 - (void)initTitle {
     self.title = @"微信小助手";
-    
-    // [self.navigationController.navigationBar setTitleTextAttributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0]}];
 }
 
 - (void)reloadTableData {
@@ -179,11 +176,29 @@
 }
 
 - (void)showBlackList {
-    WBMultiSelectGroupsViewController *contactsViewController = [[WBMultiSelectGroupsViewController alloc] initWithBlackList:[WBRedEnvelopConfig sharedConfig].blackList];
-    contactsViewController.delegate = self;
-    
+    MultiSelectContactsViewController *contactsViewController = [[objc_getClass("MultiSelectContactsViewController") alloc] init];
+    contactsViewController.m_scene = 5;
+    contactsViewController.m_delegate = self;
+
+    // 强制触发 viewDidLoad 调用
+    if ([contactsViewController respondsToSelector:@selector(loadViewIfNeeded)]) {
+        [contactsViewController loadViewIfNeeded];
+    } else {
+        contactsViewController.view.alpha = 1.0;
+    }
+
+    MMServiceCenter *serviceCenter = [objc_getClass("MMServiceCenter") defaultCenter];
+    CContactMgr *contactMgr = [serviceCenter getService:objc_getClass("CContactMgr")];
+        
+    ContactSelectView *selectView = (ContactSelectView *)[contactsViewController valueForKey:@"m_selectView"];
+    for (NSString *contactName in [WBRedEnvelopConfig sharedConfig].blackList) {
+        CContact *contact = [contactMgr getContactByName:contactName];
+        [selectView addSelect:contact];
+    }
+    [contactsViewController updatePanelBtn];
+
     MMUINavigationController *navigationController = [[objc_getClass("MMUINavigationController") alloc] initWithRootViewController:contactsViewController];
-    
+
     [self presentViewController:navigationController animated:YES completion:nil];
 }
 
@@ -280,17 +295,19 @@
     [qrCodeScanner notifyResult:rewardStr type:@"WX_CODE" version:0 rawData:rewardData];
 }
 
-#pragma mark - MultiSelectGroupsViewControllerDelegate
-- (void)onMultiSelectGroupCancel {
-    [self dismissViewControllerAnimated:YES completion:nil];
-}
-- (void)onMultiSelectGroupReturn:(NSArray *)arg1 {
-    [WBRedEnvelopConfig sharedConfig].blackList = arg1;
-    
-    [self reloadTableData];
-    
-    [self dismissViewControllerAnimated:YES completion:nil];
-}
+#pragma mark - MultiSelectContactsViewControllerDelegate
 
+- (void)onMultiSelectContactReturn:(NSArray *)arg1 {
+    NSMutableArray *blackList = [NSMutableArray new];
+    for (CContact *contact in arg1) {
+        NSString *contactName = contact.m_nsUsrName;
+        if ([contactName length] > 0 && [contactName hasSuffix:@"@chatroom"]) {
+            [blackList addObject:contactName];
+        }
+    }
+    [WBRedEnvelopConfig sharedConfig].blackList = blackList;
+    [self reloadTableData];
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
 
 @end

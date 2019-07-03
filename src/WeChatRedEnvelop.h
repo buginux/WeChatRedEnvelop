@@ -214,32 +214,13 @@
 
 @end
 
-
-@protocol ContactSelectViewDelegate <NSObject>
-
-- (void)onSelectContact:(CContact *)arg1;
-
-@end
-
 @interface ContactSelectView : UIView
 
-@property(nonatomic) unsigned int m_uiGroupScene; // @synthesize m_uiGroupScene;
-@property(nonatomic) _Bool m_bMultiSelect; // @synthesize m_bMultiSelect;
-@property(retain, nonatomic) NSMutableDictionary *m_dicMultiSelect; // @synthesize m_dicMultiSelect;
+@property(nonatomic) _Bool m_bHideSearchBar; // @synthesize m_bHideSearchBar=_m_bHideSearchBar;
 
-- (id)initWithFrame:(struct CGRect)arg1 delegate:(id)arg2;
-- (void)initData:(unsigned int)arg1;
-- (void)initView;
 - (void)addSelect:(id)arg1;
 
 @end
-
-@interface ContactsDataLogic : NSObject
-
-@property(nonatomic) unsigned int m_uiScene; // @synthesize m_uiScene;
-
-@end
-
 @interface MMUINavigationController : UINavigationController
 
 @end
@@ -315,9 +296,14 @@
 @interface MultiSelectContactsViewController : UIViewController
 
 @property(nonatomic) _Bool m_bKeepCurViewAfterSelect; // @synthesize m_bKeepCurViewAfterSelect=_m_bKeepCurViewAfterSelect;
+@property(nonatomic) _Bool m_bShowHistoryGroup; // @synthesize m_bShowHistoryGroup;
 @property(nonatomic) unsigned int m_uiGroupScene; // @synthesize m_uiGroupScene;
+@property(nonatomic) int m_scene; // @synthesize m_scene=_m_scene;
+@property(nonatomic) _Bool m_onlyChatRoom; // @synthesize m_onlyChatRoom=_m_onlyChatRoom;
 
 @property(nonatomic, weak) id <MultiSelectContactsViewControllerDelegate> m_delegate; // @synthesize m_delegate;
+
+- (void)updatePanelBtn;
 
 @end
 
