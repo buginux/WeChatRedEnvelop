@@ -1,7 +1,7 @@
 THEOS_DEVICE_IP = localhost
 THEOS_DEVICE_PORT = 2222
 ARCHS = armv7 arm64
-TARGET = iphone:latest:7.0
+TARGET = iphone:latest:8.0
 
 BUNDLE_NAME = com.swiftyper.wechatredenvelop
 com.swiftyper.wechatredenvelop_INSTALL_PATH = /Library/MobileSubstrate/DynamicLibraries
