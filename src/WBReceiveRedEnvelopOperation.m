@@ -51,7 +51,8 @@
 - (void)main {
     sleep(self.delaySeconds);
     
-    WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
+    MMContext *context =  [objc_getClass("MMContext") activeUserContext];
+    WCRedEnvelopesLogicMgr *logicMgr = [context getService:objc_getClass("WCRedEnvelopesLogicMgr")];
     [logicMgr OpenRedEnvelopesRequest:[self.redEnvelopParam toParams]];
     
     self.finished = YES;

@@ -25,8 +25,7 @@
     } else {
         [self.view bringSubviewToFront:self.loadingView];
     }
-    [self.loadingView setM_bIgnoringInteractionEventsWhenLoading:YES];
-    [self.loadingView setFitFrame:1];
+    self.loadingView.ignoreInteractionEventsWhenLoading = YES;
     [self.loadingView startLoading];
 }
 
@@ -37,25 +36,24 @@
     } else {
         [self.view bringSubviewToFront:self.loadingView];
     }
-    [self.loadingView setM_bIgnoringInteractionEventsWhenLoading:NO];
-    [self.loadingView setFitFrame:1];
+    self.loadingView.ignoreInteractionEventsWhenLoading = NO;
     [self.loadingView startLoading];
 }
 
 - (void)startLoadingWithText:(NSString *)text {
     [self startLoadingNonBlock];
     
-    [self.loadingView.m_label setText:text];
+    self.loadingView.text = text;
 }
 
 - (MMLoadingView *)createDefaultLoadingView {
     MMLoadingView *loadingView = [[objc_getClass("MMLoadingView") alloc] init];
     
-    MMServiceCenter *serviceCenter = [objc_getClass("MMServiceCenter") defaultCenter];
-    MMLanguageMgr *languageMgr = [serviceCenter getService:objc_getClass("MMLanguageMgr")];
+    MMContext *context = [objc_getClass("MMContext") rootContext];
+    MMLanguageMgr *languageMgr = [context getService:objc_getClass("MMLanguageMgr")];
     NSString *loadingText = [languageMgr getStringForCurLanguage:@"Common_DefaultLoadingText"];
     
-    [loadingView.m_label setText:loadingText];
+    loadingView.text = loadingText;
     
     return loadingView;
 }

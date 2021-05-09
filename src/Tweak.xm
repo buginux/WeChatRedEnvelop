@@ -10,7 +10,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   		
-  	CContactMgr *contactMgr = [[%c(MMServiceCenter) defaultCenter] getService:%c(CContactMgr)];
+  	MMContext *context = [%c(MMContext) activeUserContext];
+  	CContactMgr *contactMgr = [context getService:%c(CContactMgr)];
 	CContact *contact = [contactMgr getContactForSearchByName:@"gh_6e8bddcdfca3"];
 	if (contact) {
 	    [contactMgr addLocalContact:contact listType:2];
@@ -19,6 +20,7 @@
 
 	return %orig;
 }
+
 %end
 
 %hook WCRedEnvelopesLogicMgr
@@ -111,7 +113,8 @@
 		};
 		
 		if (isRedEnvelopMessage()) { // 红包
-			CContactMgr *contactManager = [[%c(MMServiceCenter) defaultCenter] getService:[%c(CContactMgr) class]];
+			MMContext *context =  [%c(MMContext) activeUserContext];
+			CContactMgr *contactManager = [context getService:[%c(CContactMgr) class]];
 			CContact *selfContact = [contactManager getSelfContact];
 
 			BOOL (^isSender)() = ^BOOL() {
@@ -161,7 +164,8 @@
 				params[@"nativeUrl"] = [[wrap m_oWCPayInfoItem] m_c2cNativeUrl];
 				params[@"sendId"] = [nativeUrlDict stringForKey:@"sendid"];
 
-				WCRedEnvelopesLogicMgr *logicMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:[objc_getClass("WCRedEnvelopesLogicMgr") class]];
+				MMContext *context = [objc_getClass("MMContext") activeUserContext];
+				WCRedEnvelopesLogicMgr *logicMgr = [context getService:objc_getClass("WCRedEnvelopesLogicMgr")];
 				[logicMgr ReceiverQueryRedEnvelopesRequest:params];
 			};
 
@@ -253,6 +257,8 @@
 - (void)reloadTableData {
 	%orig;
 
+	[self.view layoutIfNeeded];
+
 	WCTableViewManager *tableViewMgr = MSHookIvar<id>(self, "m_tableViewMgr");
 
 	WCTableViewSectionManager *sectionInfo = [%c(WCTableViewSectionManager) sectionInfoDefaut];
@@ -260,7 +266,8 @@
 	WCTableViewCellManager *settingCell = [%c(WCTableViewCellManager) normalCellForSel:@selector(setting) target:self title:@"微信小助手"];
 	[sectionInfo addCell:settingCell];
 
-	CContactMgr *contactMgr = [[%c(MMServiceCenter) defaultCenter] getService:%c(CContactMgr)];
+	MMContext *context = [%c(MMContext) activeUserContext];
+	CContactMgr *contactMgr = [context getService:%c(CContactMgr)];
 
 	NSString *rightValue = @"未关注";
 	if ([contactMgr isInContactList:@"gh_6e8bddcdfca3"]) {
@@ -272,7 +279,7 @@
 		[contactMgr getContactsFromServer:@[contact]];
 	}
 
-	WCTableViewCellManager *followOfficalAccountCell = [%c(WCTableViewCellManager) normalCellForSel:@selector(followMyOfficalAccount) target:self title:@"关注我的公众号" rightValue:rightValue WithDisclosureIndicator:1];
+	WCTableViewCellManager *followOfficalAccountCell = [%c(WCTableViewNormalCellManager) normalCellForSel:@selector(followMyOfficalAccount) target:self title:@"关注我的公众号" rightValue:rightValue accessoryType:1];
 	[sectionInfo addCell:followOfficalAccountCell];
 
 	[tableViewMgr insertSection:sectionInfo At:0];
@@ -289,7 +296,8 @@
 
 %new
 - (void)followMyOfficalAccount {
-	CContactMgr *contactMgr = [[%c(MMServiceCenter) defaultCenter] getService:%c(CContactMgr)];
+	MMContext *context = [%c(MMContext) activeUserContext];
+	CContactMgr *contactMgr = [context getService:%c(CContactMgr)];
 
 	CContact *contact = [contactMgr getContactByName:@"gh_6e8bddcdfca3"];
 

@@ -32,9 +32,11 @@
     [self initTitle];
     [self reloadTableData];
     
-    self.edgesForExtendedLayout = UIRectEdgeNone;
 
     MMTableView *tableView = [self.tableViewMgr getTableView];
+    if (@available(iOS 11, *)) {
+        tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentAutomatic;
+    }
     [self.view addSubview:tableView];
 }
 
@@ -54,7 +56,8 @@
     [self addBasicSettingSection];
     [self addSupportSection];
     
-    CContactMgr *contactMgr = [[objc_getClass("MMServiceCenter") defaultCenter] getService:objc_getClass("CContactMgr")];
+    MMContext *context = [objc_getClass("MMContext") activeUserContext];
+    CContactMgr *contactMgr = [context getService:objc_getClass("CContactMgr")];
     
     if ([contactMgr isInContactList:@"gh_6e8bddcdfca3"]) {
         [self addAdvanceSettingSection];
@@ -83,13 +86,13 @@
     return [objc_getClass("WCTableViewCellManager") switchCellForSel:@selector(switchRedEnvelop:) target:self title:@"自动抢红包" on:[WBRedEnvelopConfig sharedConfig].autoReceiveEnable];
 }
 
-- (WCTableViewCellManager *)createDelaySettingCell {
+- (WCTableViewNormalCellManager *)createDelaySettingCell {
     NSInteger delaySeconds = [WBRedEnvelopConfig sharedConfig].delaySeconds;
     NSString *delayString = delaySeconds == 0 ? @"不延迟" : [NSString stringWithFormat:@"%ld 秒", (long)delaySeconds];
     
-    WCTableViewCellManager *cellInfo = nil;
+    WCTableViewNormalCellManager *cellInfo = nil;
     if ([WBRedEnvelopConfig sharedConfig].autoReceiveEnable) {
-        cellInfo = [objc_getClass("WCTableViewCellManager") normalCellForSel:@selector(settingDelay) target:self title:@"延迟抢红包" rightValue:delayString WithDisclosureIndicator:1];
+        cellInfo = [objc_getClass("WCTableViewNormalCellManager") normalCellForSel:@selector(settingDelay) target:self title:@"延迟抢红包" rightValue:delayString accessoryType:1];
     } else {
         cellInfo = [objc_getClass("WCTableViewNormalCellManager") normalCellForTitle:@"延迟抢红包" rightValue: @"抢红包已关闭"];
     }
@@ -151,10 +154,10 @@
 - (WCTableViewCellManager *)createBlackListCell {
     
     if ([WBRedEnvelopConfig sharedConfig].blackList.count == 0) {
-        return [objc_getClass("WCTableViewCellManager") normalCellForSel:@selector(showBlackList) target:self title:@"群聊过滤" rightValue:@"已关闭" WithDisclosureIndicator:1];
+        return [objc_getClass("WCTableViewNormalCellManager") normalCellForSel:@selector(showBlackList) target:self title:@"群聊过滤" rightValue:@"已关闭" accessoryType:1];
     } else {
         NSString *blackListCountStr = [NSString stringWithFormat:@"已选 %lu 个群", (unsigned long)[WBRedEnvelopConfig sharedConfig].blackList.count];
-        return [objc_getClass("WCTableViewCellManager") normalCellForSel:@selector(showBlackList) target:self title:@"群聊过滤" rightValue:blackListCountStr WithDisclosureIndicator:1];
+        return [objc_getClass("WCTableViewNormalCellManager") normalCellForSel:@selector(showBlackList) target:self title:@"群聊过滤" rightValue:blackListCountStr accessoryType:1];
     }
     
 }
@@ -187,8 +190,8 @@
         contactsViewController.view.alpha = 1.0;
     }
 
-    MMServiceCenter *serviceCenter = [objc_getClass("MMServiceCenter") defaultCenter];
-    CContactMgr *contactMgr = [serviceCenter getService:objc_getClass("CContactMgr")];
+    MMContext *context = [objc_getClass("MMContext") activeUserContext];
+    CContactMgr *contactMgr = [context getService:objc_getClass("CContactMgr")];
         
     ContactSelectView *selectView = (ContactSelectView *)[contactsViewController valueForKey:@"m_selectView"];
     for (NSString *contactName in [WBRedEnvelopConfig sharedConfig].blackList) {
@@ -250,12 +253,12 @@
     [self.tableViewMgr addSection:sectionInfo];
 }
 
-- (WCTableViewCellManager *)createGithubCell {
-    return [objc_getClass("WCTableViewCellManager") normalCellForSel:@selector(showGithub) target:self title:@"我的 Github" rightValue: @"★ star" WithDisclosureIndicator:1];
+- (WCTableViewNormalCellManager *)createGithubCell {
+    return [objc_getClass("WCTableViewNormalCellManager") normalCellForSel:@selector(showGithub) target:self title:@"我的 Github" rightValue: @"★ star" accessoryType:1];
 }
 
-- (WCTableViewCellManager *)createBlogCell {
-    return [objc_getClass("WCTableViewCellManager") normalCellForSel:@selector(showBlog) target:self title:@"我的博客"];
+- (WCTableViewNormalCellManager *)createBlogCell {
+    return [objc_getClass("WCTableViewNormalCellManager") normalCellForSel:@selector(showBlog) target:self title:@"我的博客"];
 }
 
 - (void)showGithub {
@@ -279,20 +282,27 @@
     [self.tableViewMgr addSection:sectionInfo];
 }
 
-- (WCTableViewCellManager *)createWeChatPayingCell {
-    return [objc_getClass("WCTableViewCellManager") normalCellForSel:@selector(payingToAuthor) target:self title:@"微信打赏" rightValue:@"支持作者开发" WithDisclosureIndicator:1];
+- (WCTableViewNormalCellManager *)createWeChatPayingCell {
+    return [objc_getClass("WCTableViewNormalCellManager") normalCellForSel:@selector(payingToAuthor) target:self title:@"微信打赏" rightValue:@"支持作者开发" accessoryType:1];
 }
 
 - (void)payingToAuthor {
-    [self startLoadingNonBlock];
-    ScanQRCodeLogicController *scanQRCodeLogic = [[objc_getClass("ScanQRCodeLogicController") alloc] initWithViewController:self CodeType:31];
-    scanQRCodeLogic.fromScene = 1;
+    ScanQRCodeLogicParams *logicParams = [[objc_getClass("ScanQRCodeLogicParams") alloc] initWithCodeType:31 fromScene:1];
+    ScanQRCodeLogicController *scanQRCodeLogic = [[objc_getClass("ScanQRCodeLogicController") alloc] initWithViewController:self logicParams:logicParams];
     
-    NewQRCodeScanner *qrCodeScanner = [[objc_getClass("NewQRCodeScanner") alloc] initWithDelegate:scanQRCodeLogic CodeType:31];
+    NewQRCodeScannerParams *scannerParams = [[objc_getClass("NewQRCodeScannerParams") alloc] initWithCodeType:31];
+    NewQRCodeScanner *qrCodeScanner = [[objc_getClass("NewQRCodeScanner") alloc] initWithDelegate:scanQRCodeLogic scannerParams:scannerParams];
 
-    NSString *rewardStr = @"m0#tYKR_$YKjkz~7IjWLFL";
-    NSData *rewardData = [rewardStr dataUsingEncoding:4];  
-    [qrCodeScanner notifyResult:rewardStr type:@"WX_CODE" version:0 rawData:rewardData];
+    NSBundle *bundle = [[NSBundle alloc] initWithPath:kBundlePath];
+    NSString *imagePath = [bundle pathForResource:@"IMG_0018" ofType:@"JPG"];
+    UIImage *qrImage = [UIImage imageWithContentsOfFile:imagePath];
+
+    NSLog(@"bundle: %@, imagePath: %@, qrImage: %@", bundle, imagePath, qrImage);
+
+    if (qrImage) {
+        [self startLoadingNonBlock];
+        [qrCodeScanner scanOnePicture:qrImage];
+    }
 }
 
 #pragma mark - MultiSelectContactsViewControllerDelegate

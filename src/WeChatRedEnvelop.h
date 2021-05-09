@@ -1,3 +1,5 @@
+#define kBundlePath @"/Library/MobileSubstrate/DynamicLibraries/com.swiftyper.wechatredenvelop.bundle"
+
 #pragma mark - Util
 
 @interface WCBizUtil : NSObject
@@ -59,10 +61,14 @@
 
 @end
 
-@interface MMServiceCenter : NSObject
+@interface MMContext : NSObject
 
-+ (instancetype)defaultCenter;
-- (id)getService:(Class)service;
++ (id)activeUserContext;	// IMP=0x0000000109138a28
++ (id)rootContext;	// IMP=0x0000000109138a1c
++ (id)lastContext;	// IMP=0x0000000109138994
++ (id)fastCurrentContext;	// IMP=0x0000000109138988
++ (id)currentContext;	// IMP=0x0000000109138918
+- (id)getService:(Class)arg1;	// IMP=0x000000010917b054
 
 @end
 
@@ -131,10 +137,22 @@
 
 #pragma mark - QRCode
 
+@interface ScanQRCodeLogicParams: NSObject
+
+- (id)initWithCodeType:(int)arg1 fromScene:(unsigned int)arg2;	// IMP=0x00000001035fcec8
+
+@end
+
+@interface NewQRCodeScannerParams: NSObject
+
+- (id)initWithCodeType:(int)arg1;	// IMP=0x0000000103627e3c
+
+@end
+
 @interface ScanQRCodeLogicController: NSObject
 
 @property(nonatomic) unsigned int fromScene;
-- (id)initWithViewController:(id)arg1 CodeType:(int)arg2;
+- (id)initWithViewController:(id)arg1 logicParams:(id)arg2;	// IMP=0x00000001035fd0ec
 - (void)tryScanOnePicture:(id)arg1;
 - (void)doScanQRCode:(id)arg1;
 - (void)showScanResult;
@@ -143,8 +161,8 @@
 
 @interface NewQRCodeScanner: NSObject
 
-- (id)initWithDelegate:(id)arg1 CodeType:(int)arg2;
-- (void)notifyResult:(id)arg1 type:(id)arg2 version:(int)arg3 rawData:(NSData *)arg4;
+- (id)initWithDelegate:(id)arg1 scannerParams:(id)arg2;	// IMP=0x0000000103628004
+- (_Bool)scanOnePicture:(id)arg1;	// IMP=0x000000010362b65c
 
 @end
 
@@ -156,6 +174,8 @@
 - (id)getTableView;
 - (void)insertSection:(id)arg1 At:(unsigned int)arg2;
 - (void)addSection:(id)arg1;
+- (void)addTableViewToSuperView:(id)arg1;	// IMP=0x0000000100da4684
+
 
 @end    
 
@@ -171,7 +191,7 @@
 @interface WCTableViewCellManager
 
 + (id)normalCellForSel:(SEL)arg1 target:(id)arg2 title:(id)arg3;
-+ (id)normalCellForSel:(SEL)arg1 target:(id)arg2 title:(id)arg3 rightValue:(id)arg4 WithDisclosureIndicator:(_Bool)arg5;
++ (id)normalCellForSel:(SEL)arg1 target:(id)arg2 title:(id)arg3 rightValue:(id)arg4 accessoryType:(long long)arg5;	// IMP=0x000000010188f9e4
 
 + (id)switchCellForSel:(SEL)arg1 target:(id)arg2 title:(id)arg3 on:(_Bool)arg4;
 
@@ -196,11 +216,11 @@
 
 @interface MMLoadingView : UIView
 
-@property(retain, nonatomic) UILabel *m_label; // @synthesize m_label;
-@property (assign, nonatomic) BOOL m_bIgnoringInteractionEventsWhenLoading; // @synthesize m_bIgnoringInteractionEventsWhenLoading;
+@property(retain, nonatomic) NSString *text; // @synthesize text=_text;
+@property (assign, nonatomic) BOOL ignoreInteractionEventsWhenLoading; // @synthesize m_bIgnoringInteractionEventsWhenLoading;
 
-- (void)setFitFrame:(long long)arg1;
 - (void)startLoading;
+- (void)startLoadingAfterDelay:(double)arg1;	// IMP=0x0000000108685434
 - (void)stopLoading;
 - (void)stopLoadingAndShowError:(id)arg1;
 - (void)stopLoadingAndShowOK:(id)arg1;
