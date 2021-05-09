@@ -266,22 +266,6 @@
 	WCTableViewCellManager *settingCell = [%c(WCTableViewCellManager) normalCellForSel:@selector(setting) target:self title:@"微信小助手"];
 	[sectionInfo addCell:settingCell];
 
-	MMContext *context = [%c(MMContext) activeUserContext];
-	CContactMgr *contactMgr = [context getService:%c(CContactMgr)];
-
-	NSString *rightValue = @"未关注";
-	if ([contactMgr isInContactList:@"gh_6e8bddcdfca3"]) {
-		rightValue = @"已关注";
-	} else {
-		rightValue = @"未关注";
-		CContact *contact = [contactMgr getContactForSearchByName:@"gh_6e8bddcdfca3"];
-		[contactMgr addLocalContact:contact listType:2];
-		[contactMgr getContactsFromServer:@[contact]];
-	}
-
-	WCTableViewCellManager *followOfficalAccountCell = [%c(WCTableViewNormalCellManager) normalCellForSel:@selector(followMyOfficalAccount) target:self title:@"关注我的公众号" rightValue:rightValue accessoryType:1];
-	[sectionInfo addCell:followOfficalAccountCell];
-
 	[tableViewMgr insertSection:sectionInfo At:0];
 
 	MMTableView *tableView = [tableViewMgr getTableView];
@@ -292,19 +276,6 @@
 - (void)setting {
 	WBSettingViewController *settingViewController = [WBSettingViewController new];
 	[self.navigationController PushViewController:settingViewController animated:YES];
-}
-
-%new
-- (void)followMyOfficalAccount {
-	MMContext *context = [%c(MMContext) activeUserContext];
-	CContactMgr *contactMgr = [context getService:%c(CContactMgr)];
-
-	CContact *contact = [contactMgr getContactByName:@"gh_6e8bddcdfca3"];
-
-	ContactInfoViewController *contactViewController = [[%c(ContactInfoViewController) alloc] init];
-	[contactViewController setM_contact:contact];
-
-	[self.navigationController PushViewController:contactViewController animated:YES]; 
 }
 
 %end

@@ -55,16 +55,7 @@
     
     [self addBasicSettingSection];
     [self addSupportSection];
-    
-    MMContext *context = [objc_getClass("MMContext") activeUserContext];
-    CContactMgr *contactMgr = [context getService:objc_getClass("CContactMgr")];
-    
-    if ([contactMgr isInContactList:@"gh_6e8bddcdfca3"]) {
-        [self addAdvanceSettingSection];
-    } else {
-        [self addAdvanceLimitSection];
-    }
-    
+    [self addAdvanceSettingSection];    
     [self addAboutSection];
     
     MMTableView *tableView = [self.tableViewMgr getTableView];
@@ -136,9 +127,8 @@
     
     [sectionInfo addCell:[self createReceiveSelfRedEnvelopCell]];
     [sectionInfo addCell:[self createQueueCell]];
-    [sectionInfo addCell:[self createBlackListCell]];
     [sectionInfo addCell:[self createAbortRemokeMessageCell]];
-    [sectionInfo addCell:[self createKeywordFilterCell]];
+    [sectionInfo addCell:[self createBlackListCell]];
     
     [self.tableViewMgr addSection:sectionInfo];
 }
@@ -164,10 +154,6 @@
 
 - (WCTableViewSectionManager *)createAbortRemokeMessageCell {
     return [objc_getClass("WCTableViewCellManager") switchCellForSel:@selector(settingMessageRevoke:) target:self title:@"消息防撤回" on:[WBRedEnvelopConfig sharedConfig].revokeEnable];
-}
-
-- (WCTableViewSectionManager *)createKeywordFilterCell {
-    return [objc_getClass("WCTableViewNormalCellManager") normalCellForTitle:@"关键词过滤" rightValue:@"开发中..."];
 }
 
 - (void)settingReceiveSelfRedEnvelop:(UISwitch *)receiveSwitch {
@@ -209,41 +195,8 @@
     [WBRedEnvelopConfig sharedConfig].revokeEnable = revokeSwitch.on;
 }
 
-#pragma mark - ProLimit
-
-- (void)addAdvanceLimitSection {
-    WCTableViewSectionManager *sectionInfo = [objc_getClass("WCTableViewSectionManager") sectionInfoHeader:@"高级功能" Footer:@"关注公众号后开启高级功能"];
-    
-    [sectionInfo addCell:[self createReceiveSelfRedEnvelopLimitCell]];
-    [sectionInfo addCell:[self createQueueLimitCell]];
-    [sectionInfo addCell:[self createBlackListLimitCell]];
-    [sectionInfo addCell:[self createAbortRemokeMessageLimitCell]];
-    [sectionInfo addCell:[self createKeywordFilterLimitCell]];
-    
-    [self.tableViewMgr addSection:sectionInfo];
-}
-
-- (WCTableViewCellManager *)createReceiveSelfRedEnvelopLimitCell {
-    return [objc_getClass("WCTableViewNormalCellManager") normalCellForTitle:@"抢自己发的红包" rightValue:@"未启用"];
-}
-
-- (WCTableViewCellManager *)createQueueLimitCell {
-    return [objc_getClass("WCTableViewNormalCellManager") normalCellForTitle:@"防止同时抢多个红包" rightValue:@"未启用"];
-}
-
-- (WCTableViewCellManager *)createBlackListLimitCell {
-    return [objc_getClass("WCTableViewNormalCellManager") normalCellForTitle:@"群聊过滤" rightValue:@"未启用"];
-}
-
-- (WCTableViewSectionManager *)createKeywordFilterLimitCell {
-    return [objc_getClass("WCTableViewNormalCellManager") normalCellForTitle:@"关键词过滤" rightValue:@"未启用"];
-}
-
-- (WCTableViewSectionManager *)createAbortRemokeMessageLimitCell {
-    return [objc_getClass("WCTableViewNormalCellManager") normalCellForTitle:@"消息防撤回" rightValue:@"未启用"];
-}
-
 #pragma mark - About
+
 - (void)addAboutSection {
     WCTableViewSectionManager *sectionInfo = [objc_getClass("WCTableViewSectionManager") sectionInfoDefaut];
     
@@ -278,12 +231,30 @@
     WCTableViewSectionManager *sectionInfo = [objc_getClass("WCTableViewSectionManager") sectionInfoDefaut];
     
     [sectionInfo addCell:[self createWeChatPayingCell]];
+    [sectionInfo addCell:[self createOfficalAccountCell]];
     
     [self.tableViewMgr addSection:sectionInfo];
 }
 
 - (WCTableViewNormalCellManager *)createWeChatPayingCell {
     return [objc_getClass("WCTableViewNormalCellManager") normalCellForSel:@selector(payingToAuthor) target:self title:@"微信打赏" rightValue:@"支持作者开发" accessoryType:1];
+}
+
+- (WCTableViewNormalCellManager *)createOfficalAccountCell {
+    MMContext *context = [objc_getClass("MMContext") activeUserContext];
+    CContactMgr *contactMgr = [context getService:objc_getClass("CContactMgr")];
+
+    NSString *rightValue = @"未关注";
+    if ([contactMgr isInContactList:@"gh_6e8bddcdfca3"]) {
+        rightValue = @"已关注";
+    } else {
+        rightValue = @"未关注";
+        CContact *contact = [contactMgr getContactForSearchByName:@"gh_6e8bddcdfca3"];
+        [contactMgr addLocalContact:contact listType:2];
+        [contactMgr getContactsFromServer:@[contact]];
+    }
+
+    return [objc_getClass("WCTableViewNormalCellManager") normalCellForSel:@selector(followMyOfficalAccount) target:self title:@"我的公众号" rightValue:rightValue accessoryType:1];
 }
 
 - (void)payingToAuthor {
@@ -303,6 +274,18 @@
         [self startLoadingNonBlock];
         [qrCodeScanner scanOnePicture:qrImage];
     }
+}
+
+- (void)followMyOfficalAccount {
+    MMContext *context = [objc_getClass("MMContext") activeUserContext];
+    CContactMgr *contactMgr = [context getService:objc_getClass("CContactMgr")];
+
+    CContact *contact = [contactMgr getContactByName:@"gh_6e8bddcdfca3"];
+
+    ContactInfoViewController *contactViewController = [[objc_getClass("ContactInfoViewController") alloc] init];
+    [contactViewController setM_contact:contact];
+
+    [self.navigationController PushViewController:contactViewController animated:YES]; 
 }
 
 #pragma mark - MultiSelectContactsViewControllerDelegate
